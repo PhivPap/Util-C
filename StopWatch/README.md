@@ -1,4 +1,4 @@
-# Timer
+# StopWatch
 Implementation of a stopwatch ADT, used for measuring execution time of various parts of a program.
 
 Checked malloc(...)
