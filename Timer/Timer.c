@@ -1,15 +1,15 @@
-#include "Timer.h"
+#include "StopWatch.h"
 #include <sys/time.h>
 #include <stdlib.h>
 
-struct Timer {
+struct StopWatch {
     struct timeval check_point;
     double prev_elapsed_sec;
     unsigned char is_running;
 };
 
-Timer* Timer_new(){
-    Timer* this = malloc(sizeof(Timer));
+StopWatch* StopWatch_new(){
+    StopWatch* this = malloc(sizeof(StopWatch));
     if(!this)
         return NULL;
     gettimeofday(&this->check_point, 0);
@@ -18,11 +18,11 @@ Timer* Timer_new(){
     return this;
 }
 
-void Timer_destroy(Timer* this){
+void StopWatch_destroy(StopWatch* this){
     free(this);
 }
 
-double Timer_elapsed_sec(Timer* this){
+double StopWatch_elapsed_sec(StopWatch* this){
     if(!this->is_running)
         return this->prev_elapsed_sec;
     struct timeval timer_now;
@@ -30,13 +30,13 @@ double Timer_elapsed_sec(Timer* this){
     return this->prev_elapsed_sec + (double)(timer_now.tv_sec - this->check_point.tv_sec) + ((double)(timer_now.tv_usec - this->check_point.tv_usec)/ 1000000.0);
 }
 
-void Timer_reset(Timer* this){
+void StopWatch_reset(StopWatch* this){
     gettimeofday(&this->check_point, 0);
     this->prev_elapsed_sec = 0.0;
     this->is_running = 1;
 }
 
-void Timer_pause(Timer* this){
+void StopWatch_pause(StopWatch* this){
     if(!this->is_running)
         return;
     struct timeval timer_now;
@@ -45,14 +45,14 @@ void Timer_pause(Timer* this){
     this->is_running = 0;
 }
 
-void Timer_resume(Timer* this){
+void StopWatch_resume(StopWatch* this){
     if(this->is_running)
         return;
     gettimeofday(&this->check_point, 0);
     this->is_running = 1;
 }
 
-int Timer_is_running(Timer* this){
+int StopWatch_is_running(StopWatch* this){
     if(this->is_running)
         return 1;
     return 0;

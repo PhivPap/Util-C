@@ -1,23 +1,18 @@
-#ifndef _MY_TIMER_
-#define _MY_TIMER_
+#ifndef _MY_STOPWATCH_
+#define _MY_STOPWATCH_
 
 /* Opaque types */
-typedef struct Timer Timer;
+typedef struct StopWatch StopWatch;
 
-/* Timer functions */
-Timer* Timer_new();
-void Timer_destroy(Timer* this);
-double Timer_elapsed_sec(Timer* this);
-void Timer_reset(Timer* this);
-void Timer_pause(Timer* this);
-void Timer_resume(Timer* this);
-int Timer_is_running(Timer* this);
-double Timer_diff(Timer* timer0, Timer* timer1); // TODO
-
-/* Other functions */
-
-
-
+/* StopWatch functions */
+StopWatch* StopWatch_new();
+void StopWatch_destroy(StopWatch* this);
+double StopWatch_elapsed_sec(StopWatch* this);
+void StopWatch_reset(StopWatch* this);
+void StopWatch_pause(StopWatch* this);
+void StopWatch_resume(StopWatch* this);
+int StopWatch_is_running(StopWatch* this);
+double StopWatch_diff(StopWatch* sw0, StopWatch* sw1); // TODO
 
 
 
