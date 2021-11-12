@@ -14,15 +14,33 @@ static inline void check_init(){
     srand(time(NULL));
 }
 
-// include from & to
-int random_range(int from, int to){
-    assert(from < to);
+// include min & max
+int random_int(int min, int max){
+    assert(min < max);
     check_init();
 
     int random = rand();
-    random %= to - from + 1;
-    random += from;
+    random %= (max - min) + 1;
+    random += min;
     return random;
+}
+
+
+char random_char(char min, char max){
+    assert(min < max);
+    check_init();
+
+    unsigned char random = (unsigned char)rand();
+    random %= (max - min) + 1;
+    random += min;
+    return (char)random;
+}
+
+double random_double(double min, double max){
+    assert(min < max);
+    double range = (max - min); 
+    double div = RAND_MAX / range;
+    return min + (rand() / div);
 }
 
 char* random_string(uint length){
@@ -50,8 +68,8 @@ char* random_string(uint length){
     return (char*)str;
 }
 
-char* random_string_char_range(unsigned int length, char from, char to){
-    assert(from < to);
+char* random_string_char_range(unsigned int length, char min, char max){
+    assert(min < max);
     if(length == 0)
         return NULL;
     char* str = malloc(length);
@@ -69,8 +87,8 @@ char* random_string_char_range(unsigned int length, char from, char to){
         byte_ptr = (const char*)&random;
         for(uint j=0; j<sizeof(int); j++){
             unsigned char random_char = *byte_ptr++;
-            random_char %= (to - from) + 1;
-            random_char += from;
+            random_char %= (max - min) + 1;
+            random_char += min;
             str[byte_idx++] = random_char;
         }
             
@@ -80,8 +98,8 @@ char* random_string_char_range(unsigned int length, char from, char to){
         byte_ptr = (const char*)&random;
         for(uint i=0; i<overflow; i++){
             unsigned char random_char = *byte_ptr++;
-            random_char %= (to - from) + 1;
-            random_char += from;
+            random_char %= (max - min) + 1;
+            random_char += min;
             str[byte_idx++] = random_char;
         }
     }
