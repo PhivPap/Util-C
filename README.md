@@ -1,3 +1,2 @@
-# C-Util
-A C library collection
-.
+# Util - C
+A C library collection.

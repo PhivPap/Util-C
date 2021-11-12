@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "Vector.h"
 
 typedef unsigned int uint;
@@ -9,7 +10,7 @@ const uint RESERVE_EXP_LEN = 50;
 
 struct VIterator {
     Vector* vector;
-    uint idx;
+    uint index;
 };
 
 struct Vector {
@@ -41,51 +42,90 @@ static int Vector_aggressive_expand(Vector* this, uint index){
     return 0;
 }
 
-Vector* Vector_new(void){
-    return Vector_new_with_size(DEF_SIZE);
+// starts searching from max to 0
+static void Vector_set_last_elem_idx(Vector* this, uint max){
+    for(uint idx=max; idx>0; idx--){
+        if(this->table[idx]){
+            this->last_elem_idx = idx;
+            return;
+        }
+    }
+    if(this->table[0])
+        this->last_elem_idx = 0;
+    else
+        this->last_elem_idx = -1;
 }
 
-Vector* Vector_new_reserve(unsigned int length_to_reserve){
+Vector* Vector_new(void){
+    return Vector_new_init_size(DEF_SIZE);
+}
+
+Vector* Vector_new_init_size(unsigned int size){
     Vector* this = malloc(sizeof(Vector));
     if(!this)
         return NULL;
-    this->size = length_to_reserve + RESERVE_EXP_LEN;
+    this->size = size;
     this->element_count = 0;
-    this->table = calloc(this->size, sizeof(void*));
+    this->last_elem_idx = -1;
+    this->table = calloc(size, sizeof(void*));
     return this;
 } 
 
 void Vector_destroy(Vector* this){
     free(this->table);
-    frew(this);
+    free(this);
 }
 
 void Vector_clear(Vector* this){
     for(uint idx=0; idx<this->size; idx++)
         this->table[idx] = NULL;
     this->element_count = 0;
+    this->last_elem_idx = -1;
 }
-
-
 
 void** Vector_data(Vector* this){
     return this->table;
 }
 
 int Vector_pushback(Vector* this, const void* data){
-    if(this->last_elem_idx >= this->size)
+    if(!data)
+        return -2;
+    uint new_elem_idx = this->last_elem_idx + 1;
+    if(new_elem_idx >= this->size)
         if(Vector_expand(this) == -1)
             return -1;
-    
+    this->table[new_elem_idx] = (void*)data;
+    this->element_count++;
+    this->last_elem_idx = new_elem_idx;
+    return 0;
 }
 
 int Vector_set(Vector* this, const void* data, uint index){
     if(index > this->size)
         if(Vector_aggressive_expand(this, index) == -1)
             return -1;
-    this->table[index] = data;
-    if(index > this->last_elem_idx)
-        this->last_elem_idx = index;
+    if(this->table[index]){ // if table[index] is occupied
+        if(!data){ // if data is NULL remove the element at table[index].
+            this->table[index] = NULL;
+            this->element_count--;
+            if(index == this->last_elem_idx){ // if removing last element.
+                if(index == 0)
+                    this->last_elem_idx = -1;
+                else
+                    Vector_set_last_elem_idx(this, index - 1);
+            }      
+        }
+        else
+            this->table[index] = (void*)data;
+    }
+    else {
+        if(data){
+            this->table[index] = (void*)data;
+            this->element_count++;
+            if(index > this->last_elem_idx)
+                this->last_elem_idx = index;
+        }
+    }
     return 0;
 }
 
@@ -104,7 +144,9 @@ void* Vector_front(Vector* this){
 }
 
 void* Vector_back(Vector* this){
-    return this->table[this->push_idx - 1];
+    if(this->last_elem_idx == -1)
+        return NULL;
+    return this->table[this->last_elem_idx];
 }
 
 void* Vector_remove(Vector* this, unsigned int index){
@@ -113,8 +155,8 @@ void* Vector_remove(Vector* this, unsigned int index){
 
 VIterator* VIterator_new(Vector* vector){
     VIterator* this = malloc(sizeof(VIterator));
-    this->vector;
-    this->idx = 0;
+    this->vector = vector;
+    this->index = 0;
     return this;
 }
 
@@ -123,14 +165,27 @@ void VIterator_destroy(VIterator* this){
 }
 
 void* VIterator_peak(VIterator* this){
-    return this->vector->table[this->idx];
+    if(this->vector->element_count == 0)
+        return NULL;
+    while(this->index <= this->vector->last_elem_idx){
+        if(this->vector->table[this->index])
+            return this->vector->table[this->index];
+        this->index++;
+    }
+    return NULL;
 }
 
 void* VIterator_next(VIterator* this){
-    void* ret_val = this->vector->table[this->idx];
-    if(this->idx >= this->vector->push_idx){
+    if(this->vector->element_count == 0)
         return NULL;
+    while(this->index <= this->vector->last_elem_idx){
+        if(this->vector->table[this->index])
+            return this->vector->table[this->index++];
+        this->index++;
     }
-    this->idx++;
-    return ret_val;
+    return NULL;
+}
+
+void VIterator_reset(VIterator* this){
+    this->index = 0;
 }

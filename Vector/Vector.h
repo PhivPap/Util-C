@@ -7,7 +7,7 @@ typedef struct VIterator VIterator;
 
 /* Vector functions */
 Vector* Vector_new(void);
-Vector* Vector_new_with_size(unsigned int size);
+Vector* Vector_new_init_size(unsigned int size);
 void Vector_destroy(Vector* this);
 void Vector_clear(Vector* this);
 int Vector_pushback(Vector* this, const void* data);
