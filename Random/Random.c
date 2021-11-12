@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <stdio.h>
 
 typedef unsigned int uint;
 int initialized = 0;
@@ -51,5 +52,38 @@ char* random_string(uint length){
 
 char* random_string_char_range(unsigned int length, char from, char to){
     assert(from < to);
-    // ...
+    if(length == 0)
+        return NULL;
+    char* str = malloc(length);
+    if(!str)
+        return NULL;
+    check_init();
+
+    uint x = length / sizeof(int);
+    uint overflow = length - (x * sizeof(int));
+    int random;
+    const char* byte_ptr;
+    uint byte_idx = 0;
+    for(uint i=0; i<x; i++){
+        random = rand();
+        byte_ptr = (const char*)&random;
+        for(uint j=0; j<sizeof(int); j++){
+            unsigned char random_char = *byte_ptr++;
+            random_char %= (to - from) + 1;
+            random_char += from;
+            str[byte_idx++] = random_char;
+        }
+            
+    }
+    if(overflow != 0){
+        random = rand();
+        byte_ptr = (const char*)&random;
+        for(uint i=0; i<overflow; i++){
+            unsigned char random_char = *byte_ptr++;
+            random_char %= (to - from) + 1;
+            random_char += from;
+            str[byte_idx++] = random_char;
+        }
+    }
+    return str;
 }
