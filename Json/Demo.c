@@ -14,6 +14,7 @@ void main(){
     JsonObj_dict_add(json, "key2", JsonObj_new_number(10.1234));
     JsonObj_dict_add(json, "key3", JsonObj_new_number(-90.4321));
     JsonObj_dict_add(json, "key4", json_list);
+    JsonObj_dict_add(json, "key5", NULL);
 
     
 

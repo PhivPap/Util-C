@@ -153,6 +153,10 @@ static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth)
 }
 
 static inline void JsonObj_print(const JsonObj* this, FILE* fp, uint depth){
+    if(!this){
+        fprintf(fp, "null");
+        return;
+    }
     switch (this->type){
     case String:
         JsonObj_str_print(this, fp, depth);
@@ -179,7 +183,6 @@ static inline void JsonObj_print(const JsonObj* this, FILE* fp, uint depth){
     }
 }
 
-    
 
 void JsonObj_fprint(const JsonObj* this, FILE* fp){
     assert(this->type == Dict);
