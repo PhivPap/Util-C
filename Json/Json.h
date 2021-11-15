@@ -17,7 +17,7 @@ JsonObj* JsonObj_new_dict(void);
 int JsonObj_list_append(JsonObj* this, JsonObj* elem);
 int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value);
 
-void JsonObj_fprint(JsonObj* this, FILE* fp);
+void JsonObj_fprint(const JsonObj* this, FILE* fp);
 
 
 

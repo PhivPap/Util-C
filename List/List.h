@@ -21,6 +21,7 @@ void* List_remove(List* this, unsigned int index);
 /* ListIterator functions */
 ListIterator* ListIterator_new(List* list);
 void ListIterator_destroy(ListIterator* this);
+int ListIterator_has_next(ListIterator* this);
 void* ListIterator_next(ListIterator* this);
 void* ListIterator_peak(ListIterator* this);
 void ListIterator_reset(ListIterator* this);

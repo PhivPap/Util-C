@@ -83,7 +83,7 @@ int List_push_front(List* this, const void* data){
     ListNode* node = malloc(sizeof(ListNode));
     if(!node)
         return -1;
-    node->data = data;
+    node->data = (void*)data;
     node->next = this->head;
     this->head = node;
     if(this->tail == NULL)
@@ -96,7 +96,7 @@ int List_append(List* this, const void* data){
     ListNode* node = malloc(sizeof(ListNode));
     if(!node)
         return -1;
-    node->data = data;
+    node->data = (void*)data;
     node->next = NULL;
     if(this->length == 0){
         this->head = node;
@@ -119,7 +119,7 @@ int List_insert(List* this, const void* data, uint index){
     ListNode* new = malloc(sizeof(ListNode));
     if(!new)
         return -1;
-    new->data = data;
+    new->data = (void*)data;
     ListNode* prev;
     ListNode* node = this->head;
     uint i = 0;
@@ -186,6 +186,10 @@ ListIterator* ListIterator_new(List* list){
 
 void ListIterator_destroy(ListIterator* this){
     free(this);
+}
+
+int ListIterator_has_next(ListIterator* this){
+    return (this->current_node) && (this->current_node->next);
 }
 
 void* ListIterator_next(ListIterator* this){
