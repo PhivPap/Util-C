@@ -1,9 +1,16 @@
 #ifndef _MY_HASH_TABLE_
 #define _MY_HASH_TABLE_
 
+/* Types */
+typedef struct HTPair {
+    const char* key;
+    const void* value;
+} HTPair;
+
 /* Opaque types */
 typedef struct HashTable HashTable;
 typedef struct HTIterator HTIterator;
+typedef struct HTPairIterator HTPairIterator;
 
 /* HashTable functions */
 HashTable* HashTable_new(void);
@@ -25,5 +32,15 @@ HTIterator* HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
+
+/* HTPairIterator functions */
+HTPairIterator* HTPairIterator_new(HashTable* hashtable);
+HTPairIterator* HTPairIterator_destroy(HTPairIterator* this);
+HTPair* HTPairIterator_peak(HTPairIterator* this);
+HTPair* HTPairIterator_next(HTPairIterator* this);
+void HTPairIterator_reset(HTPairIterator* this);
+
+
+
 
 #endif

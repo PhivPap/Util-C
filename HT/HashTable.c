@@ -27,6 +27,12 @@ struct HTIterator {
     uint index;
 };
 
+struct HTPairIterator {
+    HashTable* hashtable;
+    uint index;
+    HTPair* pair;
+};
+
 static uint HashTable_hash(HashTable* this, const char* key){
     static const uint HASH_MUTLIPLIER = 65599;
     uint i = 0, hash_value = 0;
@@ -254,5 +260,67 @@ void* HTIterator_next(HTIterator* this){
 }
 
 void HTIterator_reset(HTIterator* this){
+    this->index = 0;
+}
+
+HTPairIterator* HTPairIterator_new(HashTable* hashtable){
+    HTPairIterator* this = malloc(sizeof(HTPairIterator));
+    if(!this)
+        return NULL;
+    this->hashtable = hashtable;
+    this->index = 0;
+    this->pair = NULL;
+}
+
+HTPairIterator* HTPairIterator_destroy(HTPairIterator* this){
+    if(this->pair)
+        free(this->pair);
+    free(this);
+}
+
+HTPair* HTPairIterator_peak(HTPairIterator* this){
+    if(this->pair)
+        return this->pair;
+    Node* node;
+    while(this->index < this->hashtable->table_size){
+        node = this->hashtable->table[this->index];
+        if((node != NULL) && (node->deleted == 0)){
+            HTPair* new_pair = malloc(sizeof(HTPair));
+            new_pair->key = node->key;
+            new_pair->value = node->data;
+            this->pair = new_pair;
+            return new_pair;
+        }
+        this->index++;
+    }
+    return NULL;
+}
+
+HTPair* HTPairIterator_next(HTPairIterator* this){
+    Node* node;
+    while(this->index < this->hashtable->table_size){
+        node = this->hashtable->table[this->index++];
+        if((node != NULL) && (node->deleted == 0)){
+            HTPair* new_pair = malloc(sizeof(HTPair));
+            new_pair->key = node->key;
+            new_pair->value = node->data;
+            if(this->pair)
+                free(this->pair);
+            this->pair = new_pair;
+            return new_pair;
+        }
+    }
+    if(this->pair){
+        free(this->pair);
+        this->pair = NULL;
+    }
+    return NULL;
+}
+
+void HTPairIterator_reset(HTPairIterator* this){
+    if(this->pair){
+        free(this->pair);
+        this->pair = NULL;
+    }
     this->index = 0;
 }

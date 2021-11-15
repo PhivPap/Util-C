@@ -83,7 +83,41 @@ int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value){
 }
 
 
+static inline void print_indentation(FILE* fp, uint depth){
+    for(uint i=0; i<depth; i++)
+        fprintf(fp, "    ");
+}
+
+static inline void JsonObj_str_print(JsonObj* this, FILE* fp, uint depth){
+    fprintf(fp, "\"%s\"\n", this->value.str);
+}
+
+static inline void JsonObj_num_print(JsonObj* this, FILE* fp, uint depth){
+    fprintf(fp, "%lf\n", this->value.num);
+}
+
+static inline void JsonObj_bool_print(JsonObj* this, FILE* fp, uint depth){
+    if(this->value.bool == 0)
+        fprintf(fp, "false\n");
+    else
+        fprintf(fp, "true\n");
+}
+
+static inline void JsonObj_list_print(JsonObj* this, FILE* fp, uint depth){
+    
+}
+
+static inline void JsonObj_dict_print(JsonObj* this, FILE* fp, uint depth){
+    fprintf("{\n");
+    
+    fprintf("}\n");
+}
+
+
+static inline void JsonObj_fprint_recursive(JsonObj* this, FILE* fp, uint depth){
+    
+
 void JsonObj_fprint(JsonObj* this, FILE* fp){
-    #define print(x) fprintf(fp, x)
     assert(this->type == Dict);
+    
 }
