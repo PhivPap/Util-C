@@ -270,6 +270,7 @@ HTPairIterator* HTPairIterator_new(HashTable* hashtable){
     this->hashtable = hashtable;
     this->index = 0;
     this->pair = NULL;
+    return this;
 }
 
 HTPairIterator* HTPairIterator_destroy(HTPairIterator* this){
