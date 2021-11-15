@@ -1,7 +1,7 @@
 # List
 Implementation of a singly linked list with O(1) push_front and append functions.
 
-Unchecked malloc(...).
+Checked malloc(...).
 
     List_clear(...):
         Clears the list (does not call free() on data).
@@ -18,7 +18,7 @@ Unchecked malloc(...).
 ## ListIterator:
 Implementation of a read-only List Iterator..
 
-Unchecked malloc().
+Checked malloc().
 
     ListIterator_peak(...) 
         Returns NULL if the iterator has reached the end.

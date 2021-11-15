@@ -1,6 +1,7 @@
 #ifndef _MY_RAND_
 #define _MY_RAND_
-// [from, to]
+// [min, max]
+
 int random_int(int min, int max);
 char random_char(char min, char max);
 double random_double(double min, double max);

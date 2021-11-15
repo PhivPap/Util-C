@@ -12,9 +12,9 @@ void List_destroy_free(List* this);
 void List_clear(List* this);
 void List_clear_free(List* this);
 unsigned int List_length(List* this);
-void List_push_front(List* this, const void* data);
-void List_append(List* this, const void* data);
-void List_insert(List* this, const void* data, unsigned int index);
+int List_push_front(List* this, const void* data);
+int List_append(List* this, const void* data);
+int List_insert(List* this, const void* data, unsigned int index);
 void* List_get(List* this, unsigned int index);
 void* List_remove(List* this, unsigned int index);
 

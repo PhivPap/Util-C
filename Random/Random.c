@@ -38,6 +38,8 @@ char random_char(char min, char max){
 
 double random_double(double min, double max){
     assert(min < max);
+    check_init();
+
     double range = (max - min); 
     double div = RAND_MAX / range;
     return min + (rand() / div);

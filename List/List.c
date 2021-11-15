@@ -23,6 +23,8 @@ struct ListIterator {
 
 List* List_new(void){
     List* this = malloc(sizeof(List));
+    if(!this)
+        return NULL;
     this->head = NULL;
     this->tail = NULL;
     this->length = 0;
@@ -77,18 +79,23 @@ void List_clear_free(List* this){
     this->tail = NULL;
 }
 
-void List_push_front(List* this, const void* data){
+int List_push_front(List* this, const void* data){
     ListNode* node = malloc(sizeof(ListNode));
+    if(!node)
+        return -1;
     node->data = data;
     node->next = this->head;
     this->head = node;
     if(this->tail == NULL)
         this->tail = node;
     this->length++;
+    return 0;
 }
 
-void List_append(List* this, const void* data){
+int List_append(List* this, const void* data){
     ListNode* node = malloc(sizeof(ListNode));
+    if(!node)
+        return -1;
     node->data = data;
     node->next = NULL;
     if(this->length == 0){
@@ -100,19 +107,18 @@ void List_append(List* this, const void* data){
         this->tail = node;
     }
     this->length++;
+    return 0;
 }
 
-void List_insert(List* this, const void* data, uint index){
-    if(index == 0){
-        List_push_front(this, data);
-        return;
-    }
-    if(index >= this->length){
-        List_append(this, data);
-        return;
-    }
-    
+int List_insert(List* this, const void* data, uint index){
+    if(index == 0)
+        return List_push_front(this, data);
+    if(index >= this->length)
+        return List_append(this, data);
+
     ListNode* new = malloc(sizeof(ListNode));
+    if(!new)
+        return -1;
     new->data = data;
     ListNode* prev;
     ListNode* node = this->head;
@@ -124,6 +130,7 @@ void List_insert(List* this, const void* data, uint index){
     prev->next = new;
     new->next = node;
     this->length++;
+    return 0;
 }
 
 void* List_get(List* this, unsigned int index){
@@ -170,6 +177,8 @@ void* List_remove(List* this, unsigned int index){
 
 ListIterator* ListIterator_new(List* list){
     ListIterator* this = malloc(sizeof(ListIterator));
+    if(!this)
+        return NULL;
     this->list = list;
     this->current_node = list->head;
     return this;
