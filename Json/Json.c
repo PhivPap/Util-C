@@ -403,7 +403,6 @@ static char* read_token(const char** sp){
             char* ret_val = malloc(sizeof(char) * (len + 1));
             if(!ret_val)
                 return NULL;
-            (*sp)++;
             strncpy(ret_val, token_start, len);
             ret_val[len] = 0;
             return ret_val;
