@@ -218,7 +218,7 @@ static inline void JsonObj_list_print(const JsonObj* this, FILE* fp, uint depth)
 static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth){
     HTPairIterator* iter = HTPairIterator_new(this->dict);
     if(!HTPairIterator_peak(iter))
-        fprintf(fp, "{ }\n");
+        fprintf(fp, "{}");
     else {
         fprintf(fp, "{\n");
         HTPair* pair;
@@ -532,6 +532,7 @@ static JsonObj* JsonObj_parse_dict(const char** sp){
                 return NULL;
             }
             JsonObj_dict_add(jdict, key, value);
+            free(key);
             break;
         }
         
