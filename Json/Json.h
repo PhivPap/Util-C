@@ -13,7 +13,10 @@ JsonObj* JsonObj_new_number(double num);
 JsonObj* JsonObj_new_bool(int boolean);
 JsonObj* JsonObj_new_array(void);
 JsonObj* JsonObj_new_dict(void);
-JsonObj* JsonObj_parser(FILE* fp);
+JsonObj* JsonObj_new_null(void);
+
+JsonObj* JsonObj_parse_file(FILE* fp);
+JsonObj* JsonObj_parse_string(const char* sp);
 
 void JsonObj_destroy(JsonObj* this);
 void JsonObj_deep_destroy(JsonObj* this);
