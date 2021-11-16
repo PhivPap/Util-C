@@ -11,12 +11,15 @@ typedef struct JsonObj JsonObj;
 JsonObj* JsonObj_new_string(const char* str);
 JsonObj* JsonObj_new_number(double num);
 JsonObj* JsonObj_new_bool(int boolean);
-JsonObj* JsonObj_new_list(void);
+JsonObj* JsonObj_new_array(void);
 JsonObj* JsonObj_new_dict(void);
+JsonObj* JsonObj_parser(FILE* fp);
 
-int JsonObj_list_append(JsonObj* this, JsonObj* elem);
+void JsonObj_destroy(JsonObj* this);
+void JsonObj_deep_destroy(JsonObj* this);
+
+int JsonObj_array_append(JsonObj* this, JsonObj* elem);
 int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value);
-
 void JsonObj_fprint(const JsonObj* this, FILE* fp);
 
 

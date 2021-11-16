@@ -4,10 +4,13 @@
 
 void main(){
     JsonObj* json = JsonObj_new_dict();
+    JsonObj* json2 = JsonObj_new_dict();
+    JsonObj_dict_add(json2, "key0", JsonObj_new_string("a string!"));
 
-    JsonObj* json_list = JsonObj_new_list();
-    JsonObj_list_append(json_list, JsonObj_new_bool(1));
-    JsonObj_list_append(json_list, JsonObj_new_bool(0));
+    JsonObj* json_list = JsonObj_new_array();
+    JsonObj_array_append(json_list, JsonObj_new_bool(1));
+    JsonObj_array_append(json_list, JsonObj_new_bool(0));
+    JsonObj_array_append(json_list, json2);
 
     JsonObj_dict_add(json, "key0", JsonObj_new_string("a string!"));
     JsonObj_dict_add(json, "key1", JsonObj_new_string("another str"));
@@ -22,6 +25,6 @@ void main(){
     JsonObj_fprint(json, stdout);
 
 
-    // TODO - Recursive free
+    JsonObj_deep_destroy(json);
     
 }

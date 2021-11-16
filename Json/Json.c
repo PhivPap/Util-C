@@ -7,7 +7,7 @@
 #include "../List/List.h"
 #include "../HT/HashTable.h"
 
-typedef enum Type { String, Number, Bool, _List, Dict} Type;
+typedef enum Type { String, Number, Bool, Array, Dict} Type;
 
 struct JsonObj {
     Type type;
@@ -15,8 +15,8 @@ struct JsonObj {
         char* str;
         double num;
         int bool;
-        List* list;
-        HashTable* ht;
+        List* array;
+        HashTable* dict;
     };
 };  
 
@@ -50,13 +50,13 @@ JsonObj* JsonObj_new_bool(int boolean){
     return this;
 }
 
-JsonObj* JsonObj_new_list(void){
+JsonObj* JsonObj_new_array(void){
     JsonObj* this = malloc(sizeof(JsonObj));
     List* list = List_new();
     if((!this) || (!list))
         return NULL;
-    this->type = _List;
-    this->list = list;
+    this->type = Array;
+    this->array = list;
     return this;
 }
 
@@ -66,19 +66,121 @@ JsonObj* JsonObj_new_dict(void){
     if((!this) || (!ht))
         return NULL;
     this->type = Dict;
-    this->ht = ht;
+    this->dict = ht;
     return this;
 }
 
+void JsonObj_destroy(JsonObj* this){
+    if(!this)
+        return;
+    switch (this->type){
+    case String: {
+        free(this->str);
+        free(this);
+        break;
+    }
+        
+    case Number:
+    case Bool: {
+        free(this);
+        break;
+    }
+        
+    case Array: {
+        List_destroy(this->array);
+        free(this);
+        break;
+    }
+        
+    case Dict: {
+        HashTable_destroy(this->dict);
+        free(this);
+        break;
+    }
+        
+    default:
+        assert(0);
+    }
+}
 
-int JsonObj_list_append(JsonObj* this, JsonObj* elem){
-    assert(this->type == _List);
-    return List_append(this->list, elem);
+void JsonObj_deep_destroy(JsonObj* this){
+    if(!this)
+        return;
+    switch (this->type){
+    case String:
+    case Number:
+    case Bool: {
+        JsonObj_destroy(this);
+        break;
+    }
+
+    case Array: {
+        ListIterator* iter = ListIterator_new(this->array);
+        JsonObj* list_item;
+        while(list_item = ListIterator_next(iter))
+            JsonObj_deep_destroy(list_item);
+        ListIterator_destroy(iter);
+        JsonObj_destroy(this);
+        break;
+    }
+
+    case Dict: {
+        HTIterator* iter = HTIterator_new(this->dict);
+        JsonObj* dict_item;
+        while(dict_item = HTIterator_next(iter))
+            JsonObj_deep_destroy(dict_item);
+        HTIterator_destroy(iter);
+        JsonObj_destroy(this);
+        break;
+    }
+
+    default:
+        assert(0);
+    }
+}
+
+static inline char ignore_empty_to_next_char(FILE* fp){
+    char reeeee;
+    while((reeeee == getc(fp))!= EOF){
+        if(reeeee != '\0' && reeeee != ' ' && reeeee != '\n' && reeeee != '\t' && reeeee != '\r')
+            return reeeee;
+    }
+    return 0;
+}
+
+
+
+static char* parse_dict_key(FILE* fp){
+    assert(0);
+    return NULL;
+}
+
+
+static JsonObj* parse_dict(FILE* fp){
+    assert(0);
+    return NULL;
+}
+
+JsonObj* JsonObj_parser(FILE* fp){
+    // char c = ignore_empty_to_next_char(fp);
+    // if(c != '{')
+    //     return NULL;
+    // else 
+    //     return parse_dict(fp);
+    assert(0);
+    return NULL;
+    
+}
+
+
+int JsonObj_array_append(JsonObj* this, JsonObj* elem){
+    assert(this->type == Array);
+    return List_append(this->array, elem);
 }
 
 int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value){
     assert(this->type == Dict);
-    return HashTable_insert(this->ht, key, value);
+    return HashTable_insert(this->dict, key, value);
 }
 
 
@@ -105,7 +207,7 @@ static inline void JsonObj_bool_print(const JsonObj* this, FILE* fp, uint depth)
 }
 
 static inline void JsonObj_list_print(const JsonObj* this, FILE* fp, uint depth){
-    ListIterator* iter = ListIterator_new(this->list);
+    ListIterator* iter = ListIterator_new(this->array);
     if(!ListIterator_peak(iter)) // if list empty
         fprintf(fp, "[ ]");
     else {
@@ -128,13 +230,13 @@ static inline void JsonObj_list_print(const JsonObj* this, FILE* fp, uint depth)
 }
 
 static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth){
-    HTPairIterator* iter = HTPairIterator_new(this->ht);
+    HTPairIterator* iter = HTPairIterator_new(this->dict);
     if(!HTPairIterator_peak(iter))
         fprintf(fp, "{ }\n");
     else {
         fprintf(fp, "{\n");
         HTPair* pair;
-        uint total_pairs = HashTable_element_count(this->ht);
+        uint total_pairs = HashTable_element_count(this->dict);
         uint pair_num = 1;
         while(pair = HTPairIterator_next(iter)){
             print_indentation(fp, depth + 1);
@@ -169,7 +271,7 @@ static inline void JsonObj_print(const JsonObj* this, FILE* fp, uint depth){
         JsonObj_bool_print(this, fp, depth);
         return;
 
-    case _List:
+    case Array:
         JsonObj_list_print(this, fp, depth);
         return;
 
