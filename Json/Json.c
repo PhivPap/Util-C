@@ -7,10 +7,8 @@
 #include "../List/List.h"
 #include "../HT/HashTable.h"
 
-typedef enum Type { String, Number, Bool, Array, Dict, Null } Type;
-
 struct JsonObj {
-    Type type;
+    JsonType type;
     union {
         char* str;
         double num;
@@ -18,6 +16,15 @@ struct JsonObj {
         List* array;
         HashTable* dict;
     };
+};
+
+struct JArrayIter {
+    ListIterator* list_iter;
+};
+
+struct JDictIter {
+    HTPairIterator* htp_iter;
+    JDictPair* jd_pair;
 };
 
 // some declarations to enable static function indirect recursion
@@ -28,7 +35,7 @@ JsonObj* JsonObj_new_string(const char* str){
     JsonObj* this = malloc(sizeof(JsonObj));
     if(!this)
         return NULL;
-    this->type = String;
+    this->type = JString;
     this->str = malloc((strlen(str) + 1) * sizeof(char));
     if(!this->str)
         return NULL;
@@ -40,7 +47,7 @@ JsonObj* JsonObj_new_number(double num){
     JsonObj* this = malloc(sizeof(JsonObj));
     if(!this)
         return NULL;
-    this->type = Number;
+    this->type = JNumber;
     this->num = num;
     return this;
 }
@@ -49,7 +56,7 @@ JsonObj* JsonObj_new_bool(int boolean){
     JsonObj* this = malloc(sizeof(JsonObj));
     if(!this)
         return NULL;
-    this->type = Bool;
+    this->type = JBool;
     this->bool = boolean;
     return this;
 }
@@ -63,7 +70,7 @@ JsonObj* JsonObj_new_array(void){
         free(this);
         return NULL;
     } 
-    this->type = Array;
+    this->type = JArray;
     this->array = list;
     return this;
 }
@@ -79,7 +86,7 @@ JsonObj* JsonObj_new_dict(void){
     }
     if((!this) || (!ht))
         return NULL;
-    this->type = Dict;
+    this->type = JDict;
     this->dict = ht;
     return this;
 }
@@ -88,7 +95,7 @@ JsonObj* JsonObj_new_null(){
     JsonObj* this = malloc(sizeof(JsonObj));
     if(!this)
         return NULL;
-    this->type = Null;
+    this->type = JNull;
     return this;
 }
 
@@ -96,26 +103,26 @@ void JsonObj_destroy(JsonObj* this){
     if(!this)
         return;
     switch (this->type){
-    case String: {
+    case JString: {
         free(this->str);
         free(this);
         break;
     }
         
-    case Number:
-    case Bool: 
-    case Null: {
+    case JNumber:
+    case JBool: 
+    case JNull: {
         free(this);
         break;
     }
         
-    case Array: {
+    case JArray: {
         List_destroy(this->array);
         free(this);
         break;
     }
         
-    case Dict: {
+    case JDict: {
         HashTable_destroy(this->dict);
         free(this);
         break;
@@ -128,15 +135,15 @@ void JsonObj_destroy(JsonObj* this){
 
 void JsonObj_deep_destroy(JsonObj* this){
     switch (this->type){
-    case String:
-    case Number:
-    case Bool: 
-    case Null: {
+    case JString:
+    case JNumber:
+    case JBool: 
+    case JNull: {
         JsonObj_destroy(this);
         break;
     }
 
-    case Array: {
+    case JArray: {
         ListIterator* iter = ListIterator_new(this->array);
         JsonObj* list_item;
         while(list_item = ListIterator_next(iter))
@@ -146,7 +153,7 @@ void JsonObj_deep_destroy(JsonObj* this){
         break;
     }
 
-    case Dict: {
+    case JDict: {
         HTIterator* iter = HTIterator_new(this->dict);
         JsonObj* dict_item;
         while(dict_item = HTIterator_next(iter))
@@ -163,12 +170,12 @@ void JsonObj_deep_destroy(JsonObj* this){
 
 
 int JsonObj_array_append(JsonObj* this, JsonObj* elem){
-    assert(this->type == Array);
+    assert(this->type == JArray);
     return List_append(this->array, elem);
 }
 
 int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value){
-    assert(this->type == Dict);
+    assert(this->type == JDict);
     return HashTable_insert(this->dict, key, value);
 }
 
@@ -241,31 +248,31 @@ static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth)
 
 static inline void JsonObj_print(const JsonObj* this, FILE* fp, uint depth){
     switch (this->type){
-    case String: {
+    case JString: {
         JsonObj_str_print(this, fp, depth);
         break;
     }
 
-    case Number: {
+    case JNumber: {
         JsonObj_num_print(this, fp, depth);
         break;
     }
 
-    case Bool: {
+    case JBool: {
         JsonObj_bool_print(this, fp, depth);
         break;
     }
-    case Array: {
+    case JArray: {
         JsonObj_list_print(this, fp, depth);
         break;
     }
 
-    case Dict: {
+    case JDict: {
         JsonObj_dict_print(this, fp, depth);
         break;
     }
 
-    case Null: {
+    case JNull: {
         fprintf(fp, "null");
         break;
     }
@@ -277,7 +284,7 @@ static inline void JsonObj_print(const JsonObj* this, FILE* fp, uint depth){
 
 
 void JsonObj_fprint(const JsonObj* this, FILE* fp){
-    assert(this->type == Dict);
+    assert(this->type == JDict);
     JsonObj_dict_print(this, fp, 0);
     fprintf(fp, "\n");
 }
@@ -432,16 +439,29 @@ static JsonObj* JsonObj_parse_array(const char** sp){
     JsonObj* jarray = JsonObj_new_array();
     if(!jarray)
         return NULL;
+    char c;
     while(1){
         skip_empty(sp);
-        if(**sp == ']'){
+        c = **sp;
+        switch(c){
+        case ']': {
             (*sp)++;
             return jarray;
         }
-        JsonObj* json_obj = parse_unknown(sp);
-        if(!json_obj){
-            JsonObj_deep_destroy(jarray);
-            return NULL;
+        
+        default: {
+            JsonObj* json_obj = parse_unknown(sp);
+            if(!json_obj){
+                JsonObj_deep_destroy(jarray);
+                return NULL;
+            }
+            JsonObj_array_append(jarray, json_obj);
+            skip_empty(sp);
+            if(**sp == ','){
+                (*sp)++;
+                break;
+            }    
+        }
         }
     }
 }
@@ -492,7 +512,8 @@ static JsonObj* JsonObj_parse_number(const char** sp){
         return NULL;
     char* after_last_parsed_char;
     double num = strtod(str, &after_last_parsed_char);
-    if(after_last_parsed_char != str + strlen(str)){
+    uint str_len = strlen(str);
+    if((str_len == 0) || (after_last_parsed_char != str + str_len)){
         free(str);
         return NULL;
     }
@@ -525,6 +546,7 @@ static JsonObj* JsonObj_parse_dict(const char** sp){
                 return NULL;
             }
             (*sp)++;
+            skip_empty(sp);
             JsonObj* value = parse_unknown(sp);
             if(!value){
                 free(key);
@@ -533,12 +555,17 @@ static JsonObj* JsonObj_parse_dict(const char** sp){
             }
             JsonObj_dict_add(jdict, key, value);
             free(key);
-            break;
-        }
-        
-        case '}': {
-            (*sp)++;
-            return jdict;
+            skip_empty(sp);
+            if(**sp == ','){
+                (*sp)++;
+                break;
+            }
+            if(**sp == '}'){
+                (*sp)++;
+                return jdict;
+            }
+            else
+                return NULL;
         }
 
         default: {
@@ -588,27 +615,148 @@ JsonObj* JsonObj_parse_string(const char* sp){
     JsonObj* this = parse_unknown(sp_ref);
     if(!this)
         return NULL;
-    if(this->type != Dict){
+    if(this->type != JDict){
         JsonObj_deep_destroy(this);
         return NULL;
     }
     return this;
 }
 
-JsonObj* JsonObj_parser(FILE* fp){
-    // char c = ignore_empty_to_next_char(fp);
-    // if(c != '{')
-    //     return NULL;
-    // else 
-    //     return parse_dict(fp);
-    // JsonObj* this = parse_unknown(fp);
-    // if(!this)
-    //     return NULL;
-    // if(this->type != Dict){
-    //     JsonObj_deep_destroy(this);
-    //     return NULL;
-    // }
-    // return this;
+JsonObj* JsonObj_parse_file(const char* json_file_path){
+    FILE* json_fp = fopen(json_file_path, "r");
+    if(!json_fp)
+        return NULL;
+    char* str;
+    uint len;
+    fseek(json_fp, 0, SEEK_END);
+    len = ftell(json_fp);
+    str = malloc(len + 1);
+    if(!str){
+        fclose(json_fp);
+        return NULL;
+    }
+    fseek(json_fp, 0, SEEK_SET); // return to start of file
+    fread(str, 1, len, json_fp);
+    str[len] = '\0';
+    fclose(json_fp);
+    JsonObj* this = JsonObj_parse_string(str);
+    free(str);
+    return this;
+}
 
-    assert(0);
+
+
+/* JsonObj iterators & geters */
+JsonType JsonObj_get_type(const JsonObj* this){
+    return this->type;
+}
+
+const char* JsonObj_get_string(const JsonObj* jstring){
+    assert(jstring->type == JString);
+    return jstring->str;
+}
+
+double JsonObj_get_number(const JsonObj* jnumber){
+    assert(jnumber->type == JNumber);
+    return jnumber->num;
+}
+
+int JsonObj_get_bool(const JsonObj* jbool){
+    assert(jbool->type == JBool);
+    return jbool->bool;
+}
+
+JsonObj* JsonObj_get_array_value(const JsonObj* jarray, unsigned int index){
+    assert(jarray->type == JArray);
+    return List_get(jarray->array, index);
+}
+
+JsonObj* JsonObj_get_dict_value(const JsonObj* jdict, const char* key){
+    assert(jdict->type == JDict);
+    return HashTable_get(jdict->dict, key);
+}
+
+/* JArrayIter functions */
+JArrayIter* JArrayIter_new(const JsonObj* jarray){
+    assert(jarray->type == JArray);
+    JArrayIter* this = malloc(sizeof(JArrayIter));
+    if(!this)
+        return NULL;
+    this->list_iter = ListIterator_new(jarray->array);
+    if(!this->list_iter){
+        free(this);
+        return NULL;
+    }
+    return this;
+}
+
+JsonObj* JArrayIter_peak(JArrayIter* this){
+    return ListIterator_peak(this->list_iter);
+}
+
+JsonObj* JArrayIter_next(JArrayIter* this){
+    return ListIterator_next(this->list_iter);
+}
+
+void JarrayIter_reset(JArrayIter* this){
+    ListIterator_reset(this->list_iter);
+}
+
+void JarrayIter_destroy(JArrayIter* this){
+    ListIterator_destroy(this->list_iter);
+    free(this);
+}
+
+/* JDictIter */
+JDictIter* JDictIter_new(const JsonObj* jdict){
+    assert(jdict->type == JDict);
+    JDictIter* this = malloc(sizeof(JDictIter));
+    if(!this)
+        return NULL;
+    this->htp_iter = HTPairIterator_new(jdict->dict);
+    if(!this->htp_iter){
+        free(this);
+        return NULL;
+    }
+    return this;
+}
+
+JDictPair* JDictIter_peak(JDictIter* this){
+    if(!this->jd_pair){
+        HTPair* pair = HTPairIterator_peak(this->htp_iter);
+        if(!pair)
+            return NULL;
+        this->jd_pair = malloc(sizeof(JDictPair));
+        if(!this->jd_pair)
+            return NULL;
+        this->jd_pair->key = pair->key;
+        this->jd_pair->jsonobj = (JsonObj*)pair->value;
+    }
+    return this->jd_pair;
+}
+
+JDictPair* JDictIter_next(JDictIter* this){
+    HTPair* pair = HTPairIterator_next(this->htp_iter);
+    if(!pair)
+        return NULL;
+    if(this->jd_pair)
+        free(this->jd_pair);
+    this->jd_pair = malloc(sizeof(JDictPair));
+    this->jd_pair->key = pair->key;
+    this->jd_pair->jsonobj = (JsonObj*)pair->value;
+    return this->jd_pair;
+}
+
+void JDictIter_reset(JDictIter* this){
+    HTPairIterator_reset(this->htp_iter);
+    if(this->jd_pair)
+        free(this->jd_pair);
+    this->jd_pair = NULL;
+}
+
+void JDictIter_destroy(JDictIter* this){
+    HTPairIterator_destroy(this->htp_iter);
+    if(this->jd_pair)
+        free(this->jd_pair);
+    free(this);
 }

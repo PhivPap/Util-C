@@ -1,0 +1,52 @@
+{
+    "users" : [
+        {
+            "username" : "421asaxn",
+            "full-name" : null,
+            "time-online" : 521315,
+            "friends" : ["dok521@@"],
+            "premium" : false,
+            "address" : {
+                "country" : "Germany",
+                "city" : "Berlin",
+                "street" : "Unter den Linden"
+            }
+        },
+        {
+            "username" : "dok521@@",
+            "full-name" : null,
+            "time-online" : 1402015,
+            "friends" : ["421asaxn"],
+            "premium" : true,
+            "address" : {
+                "country" : "France",
+                "city" : "Paris",
+                "street" : "Av. des Champs-Elysees"
+            }
+        },
+        {
+            "username" : "sekuen5",
+            "full-name" : null,
+            "time-online" : 582354,
+            "friends" : [],
+            "premium" : true,
+            "address" : {
+                "country" : "Greece",
+                "city" : "Athens",
+                "street" : "Vasilissis Sofias Av."
+            }
+        },
+        {
+            "username" : "t5hypoC",
+            "full-name" : null,
+            "time-online" : 12024,
+            "friends" : [],
+            "premium" : false,
+            "address" : {
+                "country" : "Italy",
+                "city" : "Rome",
+                "street" : "Via Venti Settembre"
+            }
+        }
+    ]
+}
