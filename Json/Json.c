@@ -84,8 +84,6 @@ JsonObj* JsonObj_new_dict(void){
         free(this);
         return NULL;
     }
-    if((!this) || (!ht))
-        return NULL;
     this->type = JDict;
     this->dict = ht;
     return this;
