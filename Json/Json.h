@@ -8,7 +8,7 @@ typedef struct JsonObj JsonObj;
 typedef struct JArrayIter JArrayIter;
 typedef struct JDictIter JDictIter;
 
-/* Visible types */
+/* Types */
 typedef enum JsonType { JString, JNumber, JBool, JArray, JDict, JNull } JsonType;
 
 typedef struct JDictPair {
@@ -20,6 +20,7 @@ typedef struct JDictPair {
 JsonObj* JsonObj_parse_file(const char* json_file_path);
 JsonObj* JsonObj_parse_string(const char* sp);
 void JsonObj_fprint(const JsonObj* this, FILE* fp);
+char* JsonObj_sprint(const JsonObj* this);
 
 /* JsonObj constructors and seters */
 JsonObj* JsonObj_new_string(const char* str);
@@ -37,7 +38,7 @@ int JsonObj_array_elem_destroy(JsonObj* jarray, unsigned int index);
 void JsonObj_array_deep_clear(JsonObj* jarray);
 void JsonObj_array_clear(JsonObj* jarray);
 
-/* JsonObj dict modifiers */
+/* JsonObj dictionary modifiers */
 int JsonObj_dict_add(JsonObj* jdict, const char* key, JsonObj* value);
 int JsonObj_dict_elem_deep_destroy(JsonObj* jdict, const char* key);
 int JsonObj_dict_elem_destroy(JsonObj* jdict, const char* key);
@@ -53,10 +54,10 @@ JsonType JsonObj_get_type(const JsonObj* jobj);
 const char* JsonObj_get_string(const JsonObj* jstring);
 double JsonObj_get_number(const JsonObj* jnumber);
 int JsonObj_get_bool(const JsonObj* jbool);
-unsigned int JsonObj_get_array_size(const JsonObj* jarray);
-JsonObj* JsonObj_get_array_value(const JsonObj* jarray, unsigned int index);
-unsigned int JsonObj_get_dict_size(const JsonObj* jdict);
-JsonObj* JsonObj_get_dict_value(const JsonObj* jdict, const char* key);
+unsigned int JsonObj_array_size(const JsonObj* jarray);
+JsonObj* JsonObj_array_get(const JsonObj* jarray, unsigned int index);
+unsigned int JsonObj_dict_size(const JsonObj* jdict);
+JsonObj* JsonObj_dict_get(const JsonObj* jdict, const char* key);
 
 /* JsonObj iterators */
 /*      JArrayIter functions */

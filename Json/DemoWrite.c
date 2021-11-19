@@ -22,8 +22,18 @@ void main(){
     JsonObj_dict_add(json, "key4", json_list);
     JsonObj_dict_add(json, "key5", JsonObj_new_null());
 
+
+    
     JsonObj_fprint(json, stdout);
 
+    JsonObj* json3 = JsonObj_dict_get(json, "key4");
+    JsonObj_array_deep_clear(json3);
+
+    JsonObj_fprint(json, stdout);
+
+    JsonObj_dict_elem_destroy(json, "key0");
+
+    JsonObj_fprint(json, stdout);
 
     JsonObj_deep_destroy(json);
 }

@@ -12,15 +12,15 @@ void gracefully_exit(const char* msg){
 }
 
 void print_usernames_unsafe(JsonObj* json){
-    JArrayIter* users_iter = JArrayIter_new(JsonObj_get_dict_value(json, "users"));
+    JArrayIter* users_iter = JArrayIter_new(JsonObj_dict_get(json, "users"));
     JsonObj* user;
     while(user = JArrayIter_next(users_iter)){
-        printf("%s\n", JsonObj_get_string(JsonObj_get_dict_value(user, "username")));
+        printf("%s\n", JsonObj_get_string(JsonObj_dict_get(user, "username")));
     }
 }
 
 void print_usernames_safe(JsonObj* json){
-    JsonObj* users = JsonObj_get_dict_value(json, "users");
+    JsonObj* users = JsonObj_dict_get(json, "users");
     if((!users) || (JsonObj_get_type(users) != JArray))
         gracefully_exit("Missing 'users' array in json.");
     JArrayIter* users_iter = JArrayIter_new(users);
@@ -28,7 +28,7 @@ void print_usernames_safe(JsonObj* json){
     while(user = JArrayIter_next(users_iter)){
         if(JsonObj_get_type(user) != JDict)
             gracefully_exit("Array 'users' contains non-dictionary objects.");
-        JsonObj* username = JsonObj_get_dict_value(user, "username");
+        JsonObj* username = JsonObj_dict_get(user, "username");
         if((!username) || (JsonObj_get_type(username) != JString))
             gracefully_exit("'User' is missing attribute 'username' of type string.");
         printf("%s\n", JsonObj_get_string(username));
@@ -42,7 +42,7 @@ void main(){
         return;
     }
 
-    print_usernames_safe(json);
-    //print_usernames_unsafe(json);
+    //print_usernames_safe(json);
+    print_usernames_unsafe(json);
     JsonObj_deep_destroy(json);
 }

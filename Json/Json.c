@@ -358,6 +358,10 @@ void JsonObj_fprint(const JsonObj* this, FILE* fp){
     fprintf(fp, "\n");
 }
 
+char* JsonObj_sprint(const JsonObj* this){
+    assert(0);
+}
+
 // after the call *sp points to the next 'non-empty char'
 // if *sp is not an 'empty char' the the function does nothing
 static inline void skip_empty(const char** sp){
@@ -735,22 +739,22 @@ int JsonObj_get_bool(const JsonObj* jbool){
     return jbool->bool;
 }
 
-unsigned int JsonObj_get_array_size(const JsonObj* jarray){
+unsigned int JsonObj_array_size(const JsonObj* jarray){
     assert(jarray->type == JArray);
     return List_length(jarray->array);
 }
 
-JsonObj* JsonObj_get_array_value(const JsonObj* jarray, unsigned int index){
+JsonObj* JsonObj_array_get(const JsonObj* jarray, unsigned int index){
     assert(jarray->type == JArray);
     return List_get(jarray->array, index);
 }
 
-unsigned int JsonObj_get_dict_size(const JsonObj* jdict){
+unsigned int JsonObj_dict_size(const JsonObj* jdict){
     assert(jdict->type == JDict);
     return HashTable_element_count(jdict->dict);
 }
 
-JsonObj* JsonObj_get_dict_value(const JsonObj* jdict, const char* key){
+JsonObj* JsonObj_dict_get(const JsonObj* jdict, const char* key){
     assert(jdict->type == JDict);
     return HashTable_get(jdict->dict, key);
 }
