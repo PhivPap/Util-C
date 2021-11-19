@@ -155,6 +155,7 @@ void HashTable_clear(HashTable* this){
             if(table[i]->deleted == 0)
                 free(table[i]->key);
             free(table[i]);
+            table[i] = NULL;
             elements_visited++;
         }
     }
