@@ -145,6 +145,23 @@ void HashTable_destroy(HashTable* this){
     free(this);
 }
 
+void HashTable_clear(HashTable* this){
+    uint table_size = this->table_size;
+    uint element_count = this->taken_spaces;
+    uint elements_visited = 0;
+    Node** table = this->table;
+    for(uint i=0; (elements_visited<element_count) && (i<table_size); i++){
+        if(table[i]){
+            if(table[i]->deleted == 0)
+                free(table[i]->key);
+            free(table[i]);
+            elements_visited++;
+        }
+    }
+    this->element_count = 0;
+    this->taken_spaces = 0;
+}
+
 uint HashTable_capacity(HashTable* this){
     return this->table_size;
 }

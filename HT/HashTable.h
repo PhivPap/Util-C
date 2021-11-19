@@ -16,6 +16,7 @@ typedef struct HTPairIterator HTPairIterator;
 HashTable* HashTable_new(void);
 HashTable* HashTable_new_with_size(unsigned int init_size);
 void HashTable_destroy(HashTable* this);
+void HashTable_clear(HashTable* this);
 unsigned int HashTable_capacity(HashTable* this);
 unsigned int HashTable_element_count(HashTable* this);
 int HashTable_contains(HashTable* this, const char* key);
