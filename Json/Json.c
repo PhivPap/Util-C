@@ -167,14 +167,85 @@ void JsonObj_deep_destroy(JsonObj* this){
 }
 
 
-int JsonObj_array_append(JsonObj* this, JsonObj* elem){
-    assert(this->type == JArray);
-    return List_append(this->array, elem);
+int JsonObj_array_append(JsonObj* jarray, JsonObj* elem){
+    assert(jarray->type == JArray);
+    return List_append(jarray->array, elem);
 }
 
-int JsonObj_dict_add(JsonObj* this, const char* key, JsonObj* value){
-    assert(this->type == JDict);
-    return HashTable_insert(this->dict, key, value);
+int JsonObj_array_insert(JsonObj* jarray, JsonObj* elem, unsigned int index){
+    assert(jarray->type == JArray);
+    return List_insert(jarray->array, elem, index);
+}
+
+int JsonObj_array_elem_deep_destroy(JsonObj* jarray, unsigned int index){
+    assert(jarray->type == JArray);
+    JsonObj* removed = List_remove(jarray->array, index);
+    if(!removed)
+        return -1;
+    JsonObj_deep_destroy(removed);
+    return 0;
+}
+
+int JsonObj_array_elem_destroy(JsonObj* jarray, unsigned int index){
+    assert(jarray->type == JArray);
+    JsonObj* removed = List_remove(jarray->array, index);
+    if(!removed)
+        return -1;
+    JsonObj_destroy(removed);
+    return 0;
+}
+
+void JsonObj_array_deep_clear(JsonObj* jarray){
+    assert(jarray->type == JArray);
+    ListIterator* iter = ListIterator_new(jarray->array);
+    JsonObj* array_elem;
+    while(array_elem = ListIterator_next(iter))
+        JsonObj_deep_destroy(array_elem);
+    ListIterator_destroy(iter);
+    List_clear(jarray->array);
+}
+
+void JsonObj_array_clear(JsonObj* jarray){
+    assert(jarray->type == JArray);
+    List_clear(jarray->array);
+}
+
+int JsonObj_dict_add(JsonObj* jdict, const char* key, JsonObj* value){
+    assert(jdict->type == JDict);
+    return HashTable_insert(jdict->dict, key, value);
+}
+
+int JsonObj_dict_elem_deep_destroy(JsonObj* jdict, const char* key){
+    assert(jdict->type == JDict);
+    JsonObj* removed = HashTable_remove(jdict->dict, key);
+    if(!removed)
+        return -1;
+    JsonObj_deep_destroy(removed);
+    return 0;
+}
+
+int JsonObj_dict_elem_destroy(JsonObj* jdict, const char* key){
+    assert(jdict->type == JDict);
+    JsonObj* removed = HashTable_remove(jdict->dict, key);
+    if(!removed)
+        return -1;
+    JsonObj_destroy(removed);
+    return 0;
+}
+
+void JsonObj_dict_deep_clear(JsonObj* jdict){
+    assert(jdict->type == JDict);
+    HTPairIterator* iter = HTPairIterator_new(jdict->dict);
+    HTPair* pair;
+    while(pair = HTPairIterator_next(iter))
+        JsonObj_deep_destroy((JsonObj*)pair->value);
+    HTPairIterator_destroy(iter);
+    HashTable_clear(jdict->dict);
+}
+
+void JsonObj_dict_clear(JsonObj* jdict){
+    assert(jdict->type == JDict);
+    HashTable_clear(jdict->dict);
 }
 
 static inline void print_indentation(FILE* fp, uint depth){
@@ -664,9 +735,19 @@ int JsonObj_get_bool(const JsonObj* jbool){
     return jbool->bool;
 }
 
+unsigned int JsonObj_get_array_size(const JsonObj* jarray){
+    assert(jarray->type == JArray);
+    return List_length(jarray->array);
+}
+
 JsonObj* JsonObj_get_array_value(const JsonObj* jarray, unsigned int index){
     assert(jarray->type == JArray);
     return List_get(jarray->array, index);
+}
+
+unsigned int JsonObj_get_dict_size(const JsonObj* jdict){
+    assert(jdict->type == JDict);
+    return HashTable_element_count(jdict->dict);
 }
 
 JsonObj* JsonObj_get_dict_value(const JsonObj* jdict, const char* key){
