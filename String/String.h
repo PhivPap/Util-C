@@ -4,6 +4,7 @@ typedef struct StringIterator StringIterator;
 
 /* String methods */
 String* String_new();
+String* String_new_reserve(unsigned int size);
 String* String_new_copy(const char* c_str);
 String* String_clone(const String* this);
 void String_destroy(String* this);
@@ -16,10 +17,8 @@ String* String_substring(const String* this, unsigned int start, unsigned int en
 unsigned int String_len(const String* this);
 int String_is_equal(const String* str1, const String* str2);
 int String_is_equal_c_str(const String* this, const char* c_str);
-int String_cmp(const String* str1, const String* str2);
-int String_cmp_c_str(const String* this, const char* c_str);
-int String_find(const String* haystack, const String* needle);
-int String_find_c_str(const String* haystack, const char* needle);
+int String_find(const String* haystack, const String* needle, unsigned int occurrence);
+int String_find_c_str(const String* haystack, const char* needle, unsigned int occurrence);
 void String_shrink_to_fit(String* this);
 
 
@@ -32,5 +31,5 @@ char StringIterator_next(StringIterator* this);
 char StringIterator_prev(StringIterator* this);
 void StringIterator_reset(StringIterator* this);
 void StringIterator_jump_to_last(StringIterator* this);
-int StringIterator_jump_to(StringIterator* this, unsigned int index);
+void StringIterator_jump_to(StringIterator* this, unsigned int index);
 int StringIterator_modify(StringIterator* this, char c);

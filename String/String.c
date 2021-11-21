@@ -1,11 +1,12 @@
 #include "String.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef unsigned int uint;
 
 struct String {
-    const char* c_str;
+    char* c_str;
     uint length, size;
 };
 
@@ -83,12 +84,10 @@ void String_destroy(String* this){
 
 static int String_expand(String* this, unsigned int new_len){
     uint new_size = new_len + 1 + DEF_EXPAND_ADDED_LEN;
-    char* new_c_str = malloc(new_size);
+    char* new_c_str = realloc(this->c_str, new_size);
     if(!new_c_str)
         return -1;
-    strncpy(new_c_str, this->c_str, new_size);
-    free(this->c_str);
-    this->size = new_len;
+    this->size = new_size;
     this->c_str = new_c_str;
     return 0;
 }
@@ -121,6 +120,7 @@ int String_append_str(String* this, const String* str){
     }
     else
         strncat(this->c_str, str->c_str, this->size);
+    this->length = combined_len;
     return 0;
 }
 
@@ -137,6 +137,7 @@ int String_append_c_str(String* this, const char* c_str){
     strncpy(tmp, c_str, tmp_size);
     strncat(this->c_str, tmp, tmp_size);
     free(tmp);
+    this->length = combined_len;
     return 0;
 }
 
@@ -146,10 +147,11 @@ int String_append_char(String* this, char c){
         if(String_expand(this, combined_len) == -1)
             return -1;
     this->c_str[this->length++] = c;
+    this->c_str[this->length] = '\0';
     return 0;
 }
 
-static inline min(uint x, uint y){
+static inline uint min(uint x, uint y){
     if(x < y)
         return x;
     return y;
@@ -178,32 +180,40 @@ unsigned int String_len(const String* this){
 
 
 int String_is_equal(const String* str1, const String* str2){
-    assert(0);
+    return strcmp(str1->c_str, str2->c_str) == 0;
 }
 
 int String_is_equal_c_str(const String* this, const char* c_str){
-    assert(0);
+    return strcmp(this->c_str, c_str) == 0;
 }
 
-int String_cmp(const String* str1, const String* str2){
-    assert(0);
+int String_find(const String* haystack, const String* needle, uint occurrence){
+    char* str_ptr = haystack->c_str;
+    char* occurrence_idx;
+    for(uint i=0; i<=occurrence; i++){
+        occurrence_idx = strstr(str_ptr, needle->c_str);
+        if(!occurrence_idx)
+            return -1;
+        str_ptr = occurrence_idx + 1;
+    }
+    return occurrence_idx - haystack->c_str;
 }
 
-int String_cmp_c_str(const String* this, const char* c_str){
-    assert(0);
-}
-
-int String_find(const String* haystack, const String* needle){
-    assert(0);
-}
-
-int String_find_c_str(const String* haystack, const char* needle){
-    assert(0);
+int String_find_c_str(const String* haystack, const char* needle, unsigned int occurrence){
+    char* str_ptr = haystack->c_str;
+    char* occurrence_idx;
+    for(uint i=0; i<=occurrence; i++){
+        occurrence_idx = strstr(str_ptr, needle);
+        if(!occurrence_idx)
+            return -1;
+        str_ptr = occurrence_idx + 1;
+    }
+    return occurrence_idx - haystack->c_str;
 }
 
 void String_shrink_to_fit(String* this){
     uint new_size = this->length + 1;
-    realloc(this->c_str, new_size);
+    this->c_str = realloc(this->c_str, new_size);
     this->size = new_size;
 }
 
@@ -259,13 +269,18 @@ void StringIterator_reset(StringIterator* this){
 }
 
 void StringIterator_jump_to_last(StringIterator* this){
-    assert(0);
+    this->index = this->string->length - 1;
 }
 
-int StringIterator_jump_to(StringIterator* this, unsigned int index){
-    assert(0);
+void StringIterator_jump_to(StringIterator* this, unsigned int index){
+    if(index > this->string->length)
+        index = this->string->length;
+    this->index = index;
 }
 
 int StringIterator_modify(StringIterator* this, char c){
-    assert(0);
+    if((this->index < 0) || (this->index >= this->string->length))
+        return -1;
+    this->string->c_str[this->index] = c;
+    return 0;
 }
