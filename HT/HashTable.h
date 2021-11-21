@@ -12,7 +12,7 @@ typedef struct HashTable HashTable;
 typedef struct HTIterator HTIterator;
 typedef struct HTPairIterator HTPairIterator;
 
-/* HashTable functions */
+/* HashTable methods */
 HashTable* HashTable_new(void);
 HashTable* HashTable_new_with_size(unsigned int init_size);
 void HashTable_destroy(HashTable* this);
@@ -27,14 +27,14 @@ int HashTable_set_max_load_factor(HashTable* this, double max_load_factor);
 double HashTable_get_max_load_factor(HashTable* this);
 double HashTable_get_current_load_factor(HashTable* this);
 
-/* HTIterator functions */
+/* HTIterator methods */
 HTIterator* HTIterator_new(HashTable* hashtable);
 HTIterator* HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
 
-/* HTPairIterator functions */
+/* HTPairIterator methods */
 HTPairIterator* HTPairIterator_new(HashTable* hashtable);
 HTPairIterator* HTPairIterator_destroy(HTPairIterator* this);
 HTPair* HTPairIterator_peak(HTPairIterator* this);

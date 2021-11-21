@@ -5,7 +5,7 @@
 typedef struct List List;
 typedef struct ListIterator ListIterator;
 
-/* List functions */
+/* List methods */
 List* List_new(void);
 void List_destroy(List* this);
 void List_destroy_free(List* this);
@@ -18,7 +18,7 @@ int List_insert(List* this, const void* data, unsigned int index);
 void* List_get(List* this, unsigned int index);
 void* List_remove(List* this, unsigned int index);
 
-/* ListIterator functions */
+/* ListIterator methods */
 ListIterator* ListIterator_new(List* list);
 void ListIterator_destroy(ListIterator* this);
 int ListIterator_has_next(ListIterator* this);

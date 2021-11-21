@@ -9,7 +9,7 @@ Checked malloc(...)
         
     StopWatch_elapsed_sec(...):
         Returns the time elapsed (in seconds) since the last StopWatch_reset(...) call or the constructor call.
-        Excludes time periods where the stopwatch was stopped.
+        Excludes time periods when the stopwatch was stopped.
         
     StopWatch_reset(...):
         Resets the stopwatch. Does not affect the "running" state of the stopwatch.

@@ -4,7 +4,7 @@
 /* Opaque types */
 typedef struct StopWatch StopWatch;
 
-/* StopWatch functions */
+/* StopWatch methods */
 StopWatch* StopWatch_new();
 void StopWatch_destroy(StopWatch* this);
 double StopWatch_elapsed_sec(StopWatch* this);

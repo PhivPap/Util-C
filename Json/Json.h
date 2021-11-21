@@ -60,14 +60,14 @@ unsigned int JsonObj_dict_size(const JsonObj* jdict);
 JsonObj* JsonObj_dict_get(const JsonObj* jdict, const char* key);
 
 /* JsonObj iterators */
-/*      JArrayIter functions */
+/*      JArrayIter methods */
 JArrayIter* JArrayIter_new(const JsonObj* jarray);
 JsonObj* JArrayIter_peak(JArrayIter* this);
 JsonObj* JArrayIter_next(JArrayIter* this);
 void JarrayIter_reset(JArrayIter* this);
 void JarrayIter_destroy(JArrayIter* this);
 
-/*      JDictIter */
+/*      JDictIter methods */
 JDictIter* JDictIter_new(const JsonObj* jdict);
 JDictPair* JDictIter_peak(JDictIter* this);
 JDictPair* JDictIter_next(JDictIter* this);
