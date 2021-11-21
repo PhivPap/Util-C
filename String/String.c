@@ -32,6 +32,20 @@ String* String_new(){
     return this;
 }
 
+String* String_new_reserve(uint size){
+    String* this = malloc(sizeof(String));
+    if(!this)
+        return NULL;
+    this->c_str = malloc(size + 1);
+    if(!this->c_str){
+        free(this);
+        return NULL;
+    }
+    this->size = size + 1;
+    this->length = 0;
+    return this;
+}
+
 String* String_new_copy(const char* c_str){
     String* this = malloc(sizeof(String));
     this->length = strlen(c_str);
@@ -135,12 +149,56 @@ int String_append_char(String* this, char c){
     return 0;
 }
 
-String* String_substring(const String* this, unsigned int start, unsigned int end){
-    assert(0);
+static inline min(uint x, uint y){
+    if(x < y)
+        return x;
+    return y;
+}
+
+String* String_substring(const String* this, uint start, uint end){
+    if(this->length == 0)
+        return String_new("");
+    uint _end = min(end, this->length - 1);
+    if(_end < start)
+        return String_new("");
+    String* sub_str = String_new_reserve(1 + _end - start);
+    if(!sub_str)
+        return NULL;
+    uint sub_str_idx = 0;
+    for(uint idx=start; idx <= _end; idx++){
+        sub_str->c_str[sub_str_idx++] = this->c_str[idx];
+    }
+    sub_str->c_str[sub_str_idx] = '\0';
+    return sub_str;
 }
 
 unsigned int String_len(const String* this){
     return this->length;
+}
+
+
+int String_is_equal(const String* str1, const String* str2){
+    assert(0);
+}
+
+int String_is_equal_c_str(const String* this, const char* c_str){
+    assert(0);
+}
+
+int String_cmp(const String* str1, const String* str2){
+    assert(0);
+}
+
+int String_cmp_c_str(const String* this, const char* c_str){
+    assert(0);
+}
+
+int String_find(const String* haystack, const String* needle){
+    assert(0);
+}
+
+int String_find_c_str(const String* haystack, const char* needle){
+    assert(0);
 }
 
 void String_shrink_to_fit(String* this){

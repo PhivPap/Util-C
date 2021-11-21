@@ -18,6 +18,8 @@ int String_is_equal(const String* str1, const String* str2);
 int String_is_equal_c_str(const String* this, const char* c_str);
 int String_cmp(const String* str1, const String* str2);
 int String_cmp_c_str(const String* this, const char* c_str);
+int String_find(const String* haystack, const String* needle);
+int String_find_c_str(const String* haystack, const char* needle);
 void String_shrink_to_fit(String* this);
 
 
