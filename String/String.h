@@ -1,3 +1,8 @@
+#ifndef _MY_STRING_
+#define _MY_STRING_
+
+#include "../List/List.h"
+
 /* Opaque types */
 typedef struct String String;
 typedef struct StringIterator StringIterator;
@@ -20,6 +25,7 @@ int String_is_equal_c_str(const String* this, const char* c_str);
 int String_find(const String* haystack, const String* needle, unsigned int occurrence);
 int String_find_c_str(const String* haystack, const char* needle, unsigned int occurrence);
 void String_shrink_to_fit(String* this);
+List* String_split(String* this, const char* delim);
 
 
 /* StringIterator methods */
@@ -33,3 +39,6 @@ void StringIterator_reset(StringIterator* this);
 void StringIterator_jump_to_last(StringIterator* this);
 void StringIterator_jump_to(StringIterator* this, unsigned int index);
 int StringIterator_modify(StringIterator* this, char c);
+
+
+#endif

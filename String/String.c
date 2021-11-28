@@ -1,7 +1,6 @@
 #include "String.h"
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 typedef unsigned int uint;
 
@@ -30,6 +29,7 @@ String* String_new(){
     }
     this->size = DEF_SIZE;
     this->length = 0;
+    this->c_str[0] = '\0';
     return this;
 }
 
@@ -217,6 +217,44 @@ void String_shrink_to_fit(String* this){
     this->size = new_size;
 }
 
+    // char* str_ptr = haystack->c_str;
+    // char* occurrence_idx;
+    // for(uint i=0; i<=occurrence; i++){
+    //     occurrence_idx = strstr(str_ptr, needle);
+    //     if(!occurrence_idx)
+    //         return -1;
+    //     str_ptr = occurrence_idx + 1;
+    // }
+    // return occurrence_idx - haystack->c_str;
+
+List* String_split(String* this, const char* delim){
+    List* list = List_new();
+    uint delim_len = strlen(delim);
+    char* str_ptr = this->c_str;
+    char* delim_occ;
+    while(delim_occ = strstr(str_ptr, delim)){
+        if(delim_occ == str_ptr)
+            List_append(list, String_new());
+        else
+            List_append(list, String_substring(this, str_ptr - this->c_str, (delim_occ - this->c_str) - 1));
+        str_ptr = delim_occ + delim_len;
+    }
+    List_append(list, String_substring(this, str_ptr - this->c_str, this->length));
+    return list;
+
+    // char* saveptr;
+    // char* tmp;
+    // uint search_count = 0;
+    // if(!list)
+    //     return NULL;
+    // tmp = strtok_r(this->c_str, delim, &saveptr);
+    // if(!tmp)
+    //     return list;
+    // List_append(list, String_new_copy(tmp));
+    // while(tmp = strtok_r(NULL, delim, &saveptr))
+    //     List_append(list, String_new_copy(tmp));
+    // return list;
+}
 
 /* StringIterator */
 StringIterator* StringIterator_new(String* str){

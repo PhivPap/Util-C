@@ -27,4 +27,19 @@ int main(int argc, const char** argv){
 
     String_destroy(str0);
     String_destroy(str1);
+
+    // ------------------------------------------------------------------------------------
+    printf("\n\n");
+    String* str = String_new_copy("CSV,like,parsing,missing,,values,,,");
+    List* cells = String_split(str, ",");
+    String* cell;
+    ListIterator* cell_iter = ListIterator_new(cells);
+    while(cell = ListIterator_next(cell_iter)){
+        printf("{%s}\n", String_data(cell));
+        String_destroy(cell);
+    }
+    ListIterator_destroy(cell_iter);
+    List_destroy(cells);
+    String_destroy(str);
+
 }
