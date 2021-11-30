@@ -37,6 +37,7 @@ int JsonObj_array_elem_deep_destroy(JsonObj* jarray, unsigned int index);
 int JsonObj_array_elem_destroy(JsonObj* jarray, unsigned int index);
 void JsonObj_array_deep_clear(JsonObj* jarray);
 void JsonObj_array_clear(JsonObj* jarray);
+void JsonObj_array_map(JsonObj* jarray, void (*func)(JsonObj* ));
 
 /* JsonObj dictionary modifiers */
 int JsonObj_dict_add(JsonObj* jdict, const char* key, JsonObj* value);
@@ -44,6 +45,7 @@ int JsonObj_dict_elem_deep_destroy(JsonObj* jdict, const char* key);
 int JsonObj_dict_elem_destroy(JsonObj* jdict, const char* key);
 void JsonObj_dict_deep_clear(JsonObj* jdict);
 void JsonObj_dict_clear(JsonObj* jdict);
+void JsonObj_dict_map(JsonObj* jdict, void (*func)(JsonObj* ));
 
 /*JsonObj destructors */
 void JsonObj_destroy(JsonObj* this);

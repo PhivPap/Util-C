@@ -23,5 +23,6 @@ int main(int argc, const char** argv){
 
 
     ListIterator_destroy(iter);
-    List_destroy_free(list);
+    List_map(list, free); // apply free() to all list elements
+    List_destroy(list);
 }

@@ -217,16 +217,6 @@ void String_shrink_to_fit(String* this){
     this->size = new_size;
 }
 
-    // char* str_ptr = haystack->c_str;
-    // char* occurrence_idx;
-    // for(uint i=0; i<=occurrence; i++){
-    //     occurrence_idx = strstr(str_ptr, needle);
-    //     if(!occurrence_idx)
-    //         return -1;
-    //     str_ptr = occurrence_idx + 1;
-    // }
-    // return occurrence_idx - haystack->c_str;
-
 List* String_split(String* this, const char* delim){
     List* list = List_new();
     uint delim_len = strlen(delim);
@@ -241,19 +231,6 @@ List* String_split(String* this, const char* delim){
     }
     List_append(list, String_substring(this, str_ptr - this->c_str, this->length));
     return list;
-
-    // char* saveptr;
-    // char* tmp;
-    // uint search_count = 0;
-    // if(!list)
-    //     return NULL;
-    // tmp = strtok_r(this->c_str, delim, &saveptr);
-    // if(!tmp)
-    //     return list;
-    // List_append(list, String_new_copy(tmp));
-    // while(tmp = strtok_r(NULL, delim, &saveptr))
-    //     List_append(list, String_new_copy(tmp));
-    // return list;
 }
 
 /* StringIterator */

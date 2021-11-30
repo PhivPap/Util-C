@@ -244,6 +244,14 @@ int HashTable_contains(HashTable* this, const char* key){
     return 0;
 }
 
+void HashTable_map(HashTable* this, void (*func)(void* )){
+    HTIterator* iter = HTIterator_new(this);
+    void* ht_elem;
+    while(ht_elem = HTIterator_next(iter))
+        func(ht_elem);
+    HTIterator_destroy(iter);
+}
+
 HTIterator* HTIterator_new(HashTable* hashtable){
     HTIterator* this = malloc(sizeof(HTIterator));
     if(!this)

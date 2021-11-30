@@ -26,6 +26,7 @@ void* HashTable_remove(HashTable* this, const char* key);
 int HashTable_set_max_load_factor(HashTable* this, double max_load_factor);
 double HashTable_get_max_load_factor(HashTable* this);
 double HashTable_get_current_load_factor(HashTable* this);
+void HashTable_map(HashTable* this, void (*func)(void* ));
 
 /* HTIterator methods */
 HTIterator* HTIterator_new(HashTable* hashtable);

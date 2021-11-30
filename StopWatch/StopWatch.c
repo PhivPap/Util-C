@@ -53,7 +53,5 @@ void StopWatch_resume(StopWatch* this){
 }
 
 int StopWatch_is_running(StopWatch* this){
-    if(this->is_running)
-        return 1;
-    return 0;
+    return (int)this->is_running;
 }

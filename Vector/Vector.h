@@ -17,6 +17,7 @@ int Vector_set(Vector* this, const void* data, unsigned int index);
 void* Vector_front(Vector* this);
 void* Vector_back(Vector* this);
 void* Vector_remove(Vector* this, unsigned int index);
+void Vector_map(Vector* this, void (*func)(void *));
 
 /* VIterator functions */
 VIterator* VIterator_new(Vector* vector);

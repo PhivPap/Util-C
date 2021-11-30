@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "Vector.h"
 
 typedef unsigned int uint;
@@ -130,7 +131,7 @@ int Vector_set(Vector* this, const void* data, uint index){
 }
 
 int Vector_insert(Vector* this, const void* data, unsigned int index){
-    
+    assert(0);
 }
 
 void* Vector_get(Vector* this, uint index){
@@ -150,7 +151,15 @@ void* Vector_back(Vector* this){
 }
 
 void* Vector_remove(Vector* this, unsigned int index){
+    assert(0);
+}
 
+void Vector_map(Vector* this, void (*func)(void *)){
+    VIterator* iter = VIterator_new(this);
+    void* vec_elem;
+    while(vec_elem = VIterator_next(iter))
+        func(vec_elem);
+    VIterator_destroy(iter);
 }
 
 VIterator* VIterator_new(Vector* vector){

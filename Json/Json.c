@@ -210,6 +210,15 @@ void JsonObj_array_clear(JsonObj* jarray){
     List_clear(jarray->array);
 }
 
+void JsonObj_array_map(JsonObj* jarray, void (*func)(JsonObj* )){
+    assert(jarray->type == JArray);
+    JArrayIter* iter = JArrayIter_new(jarray);
+    JsonObj* jarray_item;
+    while(jarray_item = JArrayIter_next(iter))
+        func(jarray_item);
+    JarrayIter_destroy(iter);
+}
+
 int JsonObj_dict_add(JsonObj* jdict, const char* key, JsonObj* value){
     assert(jdict->type == JDict);
     return HashTable_insert(jdict->dict, key, value);
@@ -246,6 +255,15 @@ void JsonObj_dict_deep_clear(JsonObj* jdict){
 void JsonObj_dict_clear(JsonObj* jdict){
     assert(jdict->type == JDict);
     HashTable_clear(jdict->dict);
+}
+
+void JsonObj_dict_map(JsonObj* jdict, void (*func)(JsonObj* )){
+    assert(jdict->type == JDict);
+    JDictIter* iter = JDictIter_new(jdict);
+    JDictPair* jdict_pair;
+    while(jdict_pair = JDictIter_next(iter))
+        func(jdict_pair->jsonobj);
+    JDictIter_destroy(iter);
 }
 
 static inline void print_indentation(FILE* fp, uint depth){

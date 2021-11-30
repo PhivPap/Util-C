@@ -11,6 +11,7 @@ typedef struct StringIterator StringIterator;
 String* String_new();
 String* String_new_reserve(unsigned int size);
 String* String_new_copy(const char* c_str);
+//String* String_new_combine();
 String* String_clone(const String* this);
 void String_destroy(String* this);
 const char* String_data(const String* this);
