@@ -142,21 +142,13 @@ void JsonObj_deep_destroy(JsonObj* this){
     }
 
     case JArray: {
-        ListIterator* iter = ListIterator_new(this->array);
-        JsonObj* list_item;
-        while(list_item = ListIterator_next(iter))
-            JsonObj_deep_destroy(list_item);
-        ListIterator_destroy(iter);
+        List_map(this->array, (void (*)(void* ))JsonObj_deep_destroy);
         JsonObj_destroy(this);
         break;
     }
 
     case JDict: {
-        HTIterator* iter = HTIterator_new(this->dict);
-        JsonObj* dict_item;
-        while(dict_item = HTIterator_next(iter))
-            JsonObj_deep_destroy(dict_item);
-        HTIterator_destroy(iter);
+        HashTable_map(this->dict, (void (*)(void* ))JsonObj_deep_destroy);
         JsonObj_destroy(this);
         break;
     }
@@ -197,11 +189,7 @@ int JsonObj_array_elem_destroy(JsonObj* jarray, unsigned int index){
 
 void JsonObj_array_deep_clear(JsonObj* jarray){
     assert(jarray->type == JArray);
-    ListIterator* iter = ListIterator_new(jarray->array);
-    JsonObj* array_elem;
-    while(array_elem = ListIterator_next(iter))
-        JsonObj_deep_destroy(array_elem);
-    ListIterator_destroy(iter);
+    List_map(jarray->array, (void (*)(void *))JsonObj_deep_destroy);
     List_clear(jarray->array);
 }
 
@@ -212,11 +200,7 @@ void JsonObj_array_clear(JsonObj* jarray){
 
 void JsonObj_array_map(JsonObj* jarray, void (*func)(JsonObj* )){
     assert(jarray->type == JArray);
-    JArrayIter* iter = JArrayIter_new(jarray);
-    JsonObj* jarray_item;
-    while(jarray_item = JArrayIter_next(iter))
-        func(jarray_item);
-    JarrayIter_destroy(iter);
+    List_map(jarray->array, (void (*)(void*))func);
 }
 
 int JsonObj_dict_add(JsonObj* jdict, const char* key, JsonObj* value){
@@ -398,64 +382,6 @@ static inline void skip_empty(const char** sp){
         (*sp)++;
     }
 }
-
-// static inline char* read_to_next_empty_init_char(FILE* fp, char init){
-//     char c;
-//     uint idx = 0, str_size = INIT_STR_LEN;
-//     char* str = calloc(str_size, sizeof(char));
-//     if(!str)
-//         return NULL;
-//     if(init)
-//         str[idx++] = init;
-//     while((c == getc(fp))!= EOF){
-//         if((c == '\0') || (c == ' ') || (c == '\n') || (c == '\t') || (c == '\r'))
-//             return str;
-//         str[idx++] = c;
-//         if(idx >= str_size){
-//             str_size *= STR_LEN_MUL;
-//             char* new_str = calloc(str_size, sizeof(char));
-//             if(!new_str){
-//                 free(str);
-//                 return NULL;
-//             }
-//             strcpy(new_str, str);
-//             free(str);
-//             str = new_str;
-//         }
-//     }
-//     return NULL;
-// }
-
-// static inline char* read_to_next_empty(FILE* fp){
-//     read_to_next_empty_init_char(fp, 0);
-// }
-
-// static inline char* parse_str(const char** sp){
-//     char c, prev = 0;
-//     uint idx = 0, str_size = INIT_STR_LEN;
-//     char* str = calloc(str_size, sizeof(char));
-//     if(!str)
-//         return NULL;
-//     while(c = **sp){
-//         // FIX "\\n"
-//         if((c == '"') && (prev != '\\'))
-//             return str;
-//         str[idx++] = c;
-//         prev = c;
-//         if(idx + 1 >= str_size){
-//             str_size *= STR_LEN_MUL;
-//             char* new_str = calloc(str_size, sizeof(char));
-//             if(!new_str){
-//                 free(str);
-//                 return NULL;
-//             }
-//             strcpy(new_str, str);
-//             free(str);
-//             str = new_str;
-//         }
-//     }
-//     return NULL;
-// }
 
 // input: (*sp = "abcdef\"g") -> output (abcdef"g) [malloc'd]
 // after the call *sp points to char after string the ending "
