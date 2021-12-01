@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "String.h"
+#include "../List/List.h"
 
 int main(int argc, const char** argv){
     String* str0 = String_new();
@@ -34,12 +35,10 @@ int main(int argc, const char** argv){
     List* cells = String_split(str, ",");
     String* cell;
     ListIterator* cell_iter = ListIterator_new(cells);
-    while(cell = ListIterator_next(cell_iter)){
+    while(cell = ListIterator_next(cell_iter))
         printf("{%s}\n", String_data(cell));
-        String_destroy(cell);
-    }
     ListIterator_destroy(cell_iter);
+    List_map(cells, (void (*)(void* ))String_destroy);
     List_destroy(cells);
     String_destroy(str);
-
 }

@@ -14,9 +14,9 @@ void gracefully_exit(const char* msg){
 void print_usernames_unsafe(JsonObj* json){
     JArrayIter* users_iter = JArrayIter_new(JsonObj_dict_get(json, "users"));
     JsonObj* user;
-    while(user = JArrayIter_next(users_iter)){
+    while(user = JArrayIter_next(users_iter))
         printf("%s\n", JsonObj_get_string(JsonObj_dict_get(user, "username")));
-    }
+    JarrayIter_destroy(users_iter);
 }
 
 void print_usernames_safe(JsonObj* json){
@@ -33,6 +33,7 @@ void print_usernames_safe(JsonObj* json){
             gracefully_exit("'User' is missing attribute 'username' of type string.");
         printf("%s\n", JsonObj_get_string(username));
     }
+    JarrayIter_destroy(users_iter);
 }
 
 void main(){
