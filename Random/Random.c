@@ -48,7 +48,7 @@ double random_double(double min, double max){
 char* random_string(uint length){
     if(length == 0)
         return NULL;
-    int* str = malloc(length);
+    int* str = malloc(length + 1);
     if(!str)
         return NULL;
     check_init();
@@ -67,6 +67,7 @@ char* random_string(uint length){
         for(uint i=0; i<overflow; i++)
             ((char*)str)[idx++] = *byte_ptr++;
     }
+    str[length] = '\0';
     return (char*)str;
 }
 
@@ -74,7 +75,7 @@ char* random_string_char_range(unsigned int length, char min, char max){
     assert(min < max);
     if(length == 0)
         return NULL;
-    char* str = malloc(length);
+    char* str = malloc(length + 1);
     if(!str)
         return NULL;
     check_init();
@@ -93,7 +94,6 @@ char* random_string_char_range(unsigned int length, char min, char max){
             random_char += min;
             str[byte_idx++] = random_char;
         }
-            
     }
     if(overflow != 0){
         random = rand();
@@ -105,5 +105,6 @@ char* random_string_char_range(unsigned int length, char min, char max){
             str[byte_idx++] = random_char;
         }
     }
+    str[length] = '\0';
     return str;
 }
