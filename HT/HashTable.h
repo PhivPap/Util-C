@@ -30,14 +30,14 @@ void HashTable_map(HashTable* this, void (*func)(void* ));
 
 /* HTIterator methods */
 HTIterator* HTIterator_new(HashTable* hashtable);
-HTIterator* HTIterator_destroy(HTIterator* this);
+void HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
 
 /* HTPairIterator methods */
 HTPairIterator* HTPairIterator_new(HashTable* hashtable);
-HTPairIterator* HTPairIterator_destroy(HTPairIterator* this);
+void HTPairIterator_destroy(HTPairIterator* this);
 HTPair* HTPairIterator_peak(HTPairIterator* this);
 HTPair* HTPairIterator_next(HTPairIterator* this);
 void HTPairIterator_reset(HTPairIterator* this);

@@ -258,9 +258,10 @@ HTIterator* HTIterator_new(HashTable* hashtable){
         return NULL;
     this->hashtable = hashtable;
     this->index = 0;
+    return this;
 }
 
-HTIterator* HTIterator_destroy(HTIterator* this){
+void HTIterator_destroy(HTIterator* this){
     free(this);
 }
 
@@ -299,7 +300,7 @@ HTPairIterator* HTPairIterator_new(HashTable* hashtable){
     return this;
 }
 
-HTPairIterator* HTPairIterator_destroy(HTPairIterator* this){
+void HTPairIterator_destroy(HTPairIterator* this){
     if(this->pair)
         free(this->pair);
     free(this);
