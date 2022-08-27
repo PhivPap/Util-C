@@ -171,10 +171,33 @@ uint HashTable_element_count(HashTable* this){
     return this->element_count;
 }
 
+static void** HashTable_get_val_ref(HashTable* this, const char* key){
+    uint idx = HashTable_hash(this, key);
+    uint visited = 0;
+    Node** table = this->table;
+    while(visited < this->element_count){
+        if(table[idx]){
+            if((table[idx]->deleted == 0) && strcmp(key, table[idx]->key) == 0)
+                return &(table[idx]->data);
+        }
+        else
+            break;
+        visited++;
+        idx++;
+        idx = idx % this->table_size;
+    }
+    return NULL;
+}
+
 int HashTable_insert(HashTable* this, const char* key, const void* value){
     if((double)this->taken_spaces / (double)this->table_size >= this->max_load_factor){
         if(HashTable_double_size(this) == -1)
             return -1;
+    }
+    void** val_ref = HashTable_get_val_ref(this, key);
+    if (val_ref != NULL) {
+        *val_ref = value;
+        return 0;
     }
     Node* new_node = Node_new(key, value);
     if(!new_node)
