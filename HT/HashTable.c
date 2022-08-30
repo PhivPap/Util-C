@@ -319,28 +319,27 @@ HTPairIterator* HTPairIterator_new(HashTable* hashtable){
         return NULL;
     this->hashtable = hashtable;
     this->index = 0;
-    this->pair = NULL;
+    this->pair = malloc(sizeof(HTPair));
+    if (!this->pair) {
+        free(this);
+        return NULL;
+    }
     return this;
 }
 
 void HTPairIterator_destroy(HTPairIterator* this){
-    if(this->pair)
-        free(this->pair);
+    free(this->pair);
     free(this);
 }
 
 HTPair* HTPairIterator_peak(HTPairIterator* this){
-    if(this->pair)
-        return this->pair;
     Node* node;
     while(this->index < this->hashtable->table_size){
         node = this->hashtable->table[this->index];
         if((node != NULL) && (node->deleted == 0)){
-            HTPair* new_pair = malloc(sizeof(HTPair));
-            new_pair->key = node->key;
-            new_pair->value = node->data;
-            this->pair = new_pair;
-            return new_pair;
+            this->pair->key = node->key;
+            this->pair->value = node->data;
+            return this->pair;
         }
         this->index++;
     }
@@ -352,26 +351,14 @@ HTPair* HTPairIterator_next(HTPairIterator* this){
     while(this->index < this->hashtable->table_size){
         node = this->hashtable->table[this->index++];
         if((node != NULL) && (node->deleted == 0)){
-            HTPair* new_pair = malloc(sizeof(HTPair));
-            new_pair->key = node->key;
-            new_pair->value = node->data;
-            if(this->pair)
-                free(this->pair);
-            this->pair = new_pair;
-            return new_pair;
+            this->pair->key = node->key;
+            this->pair->value = node->data;
+            return this->pair;
         }
-    }
-    if(this->pair){
-        free(this->pair);
-        this->pair = NULL;
     }
     return NULL;
 }
 
 void HTPairIterator_reset(HTPairIterator* this){
-    if(this->pair){
-        free(this->pair);
-        this->pair = NULL;
-    }
     this->index = 0;
 }
