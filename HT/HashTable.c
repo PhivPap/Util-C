@@ -30,7 +30,7 @@ struct HTIterator {
 struct HTPairIterator {
     HashTable* hashtable;
     uint index;
-    HTPair* pair;
+    HTPair pair;
 };
 
 static uint HashTable_hash(HashTable* this, const char* key){
@@ -319,16 +319,10 @@ HTPairIterator* HTPairIterator_new(HashTable* hashtable){
         return NULL;
     this->hashtable = hashtable;
     this->index = 0;
-    this->pair = malloc(sizeof(HTPair));
-    if (!this->pair) {
-        free(this);
-        return NULL;
-    }
     return this;
 }
 
 void HTPairIterator_destroy(HTPairIterator* this){
-    free(this->pair);
     free(this);
 }
 
@@ -337,9 +331,9 @@ HTPair* HTPairIterator_peak(HTPairIterator* this){
     while(this->index < this->hashtable->table_size){
         node = this->hashtable->table[this->index];
         if((node != NULL) && (node->deleted == 0)){
-            this->pair->key = node->key;
-            this->pair->value = node->data;
-            return this->pair;
+            this->pair.key = node->key;
+            this->pair.value = node->data;
+            return &(this->pair);
         }
         this->index++;
     }
@@ -351,9 +345,9 @@ HTPair* HTPairIterator_next(HTPairIterator* this){
     while(this->index < this->hashtable->table_size){
         node = this->hashtable->table[this->index++];
         if((node != NULL) && (node->deleted == 0)){
-            this->pair->key = node->key;
-            this->pair->value = node->data;
-            return this->pair;
+            this->pair.key = node->key;
+            this->pair.value = node->data;
+            return &(this->pair);
         }
     }
     return NULL;
