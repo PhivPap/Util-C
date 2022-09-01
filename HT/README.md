@@ -1,5 +1,5 @@
 # HashTable
-Implementation of an open address hash table with linear probing.
+Implementation of an open addressing hash table with linear probing.
 
 Checked malloc.
 
