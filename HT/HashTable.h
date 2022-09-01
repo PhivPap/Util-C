@@ -11,6 +11,7 @@ typedef struct HTPair {
 typedef struct HashTable HashTable;
 typedef struct HTIterator HTIterator;
 typedef struct HTPairIterator HTPairIterator;
+typedef struct HTKeyIterator HTKeyIterator;
 
 /* HashTable methods */
 HashTable* HashTable_new(void);
@@ -34,6 +35,13 @@ void HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
+
+/* HTKeyIterator methods */
+HTKeyIterator* HTKeyIterator_new(HashTable* hashtable);
+void HTKeyIterator_destroy(HTKeyIterator* this);
+const char* HTKeyIterator_peak(HTKeyIterator* this);
+const char* HTKeyIterator_next(HTKeyIterator* this);
+void HTKeyIterator_reset(HTKeyIterator* this);
 
 /* HTPairIterator methods */
 HTPairIterator* HTPairIterator_new(HashTable* hashtable);

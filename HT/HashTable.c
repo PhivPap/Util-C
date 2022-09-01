@@ -27,6 +27,11 @@ struct HTIterator {
     uint index;
 };
 
+struct HTKeyIterator {
+    HashTable* hashtable;
+    uint index;
+};
+
 struct HTPairIterator {
     HashTable* hashtable;
     uint index;
@@ -196,7 +201,7 @@ int HashTable_insert(HashTable* this, const char* key, const void* value){
     }
     void** val_ref = HashTable_get_val_ref(this, key);
     if (val_ref != NULL) {
-        *val_ref = value;
+        *val_ref = (void*)value;
         return 0;
     }
     Node* new_node = Node_new(key, value);
@@ -310,6 +315,44 @@ void* HTIterator_next(HTIterator* this){
 }
 
 void HTIterator_reset(HTIterator* this){
+    this->index = 0;
+}
+
+HTKeyIterator* HTKeyIterator_new(HashTable* hashtable) {
+    HTKeyIterator* this = malloc(sizeof(HTKeyIterator));
+    if(!this)
+        return NULL;
+    this->hashtable = hashtable;
+    this->index = 0;
+    return this;
+}
+
+void HTKeyIterator_destroy(HTKeyIterator* this) {
+    free(this);
+}
+
+const char* HTKeyIterator_peak(HTKeyIterator* this) {
+    Node* node;
+    while(this->index < this->hashtable->table_size){
+        node = this->hashtable->table[this->index];
+        if((node != NULL) && (node->deleted == 0))
+            return node->key;
+        this->index++;
+    }
+    return NULL;
+}
+
+const char* HTKeyIterator_next(HTKeyIterator* this) {
+    Node* node;
+    while(this->index < this->hashtable->table_size){
+        node = this->hashtable->table[this->index++];
+        if((node != NULL) && (node->deleted == 0))
+            return node->key;
+    }
+    return NULL;
+}
+
+void HTKeyIterator_reset(HTKeyIterator* this) {
     this->index = 0;
 }
 
