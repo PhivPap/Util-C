@@ -6,7 +6,7 @@
 
 
 void main(){
-    Vector* vec = Vector_new();
+    Vector* vec = Vector_new_init_size(2);
     int a = 2, b = 3, c = 23, d = 100, e = 99999;
     Vector_pushback(vec, &a);
     Vector_pushback(vec, &b);
