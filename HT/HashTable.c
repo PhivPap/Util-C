@@ -76,7 +76,7 @@ static void HashTable_insert_node(HashTable* this, Node* node){
 }
 
 static int HashTable_double_size(HashTable* this){
-    HashTable* new_ht = HashTable_new_with_size(this->table_size * 2);
+    HashTable* new_ht = HashTable_new_init_size(this->table_size * 2);
     uint table_size = this->table_size;
     uint element_count = this->taken_spaces;
     uint elements_visited = 0;
@@ -99,10 +99,10 @@ static int HashTable_double_size(HashTable* this){
 }
 
 HashTable* HashTable_new(void){
-    return HashTable_new_with_size(DEF_SIZE);
+    return HashTable_new_init_size(DEF_SIZE);
 }
 
-HashTable* HashTable_new_with_size(uint init_size){
+HashTable* HashTable_new_init_size(uint init_size){
     HashTable* this = malloc(sizeof(HashTable));
     if(!this) 
         return NULL;

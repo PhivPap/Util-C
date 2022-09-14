@@ -8,7 +8,7 @@ void map_func_triple(void* ht_elem){
 
 int main(int argc, const char** argv){
     int a = 2, b = 3, c = 10, d = 230, e = 1000;
-    HashTable* ht = HashTable_new_with_size(20);
+    HashTable* ht = HashTable_new_init_size(20);
 
     HashTable_insert(ht, "a", &a);
     HashTable_insert(ht, "b", &b);
