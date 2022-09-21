@@ -1,5 +1,7 @@
 #ifndef _MY_HASH_TABLE_
 #define _MY_HASH_TABLE_
+#include <inttypes.h>
+
 
 /* Types */
 typedef struct HTPair {
@@ -15,16 +17,17 @@ typedef struct HTKeyIterator HTKeyIterator;
 
 /* HashTable methods */
 HashTable* HashTable_new(void);
-HashTable* HashTable_new_init_size(unsigned int init_size);
+HashTable* HashTable_new_init_size(uint32_t init_size);
+HashTable* HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size));
 void HashTable_destroy(HashTable* this);
 void HashTable_clear(HashTable* this);
-unsigned int HashTable_capacity(HashTable* this);
-unsigned int HashTable_element_count(HashTable* this);
-int HashTable_contains(HashTable* this, const char* key);
-int HashTable_insert(HashTable* this, const char* key, const void* value);
+uint32_t HashTable_capacity(HashTable* this);
+uint32_t HashTable_element_count(HashTable* this);
+int32_t HashTable_contains(HashTable* this, const char* key);
+int32_t HashTable_insert(HashTable* this, const char* key, const void* value);
 void* HashTable_get(HashTable* this, const char* key);
 void* HashTable_remove(HashTable* this, const char* key);
-int HashTable_set_max_load_factor(HashTable* this, double max_load_factor);
+int32_t HashTable_set_max_load_factor(HashTable* this, double max_load_factor);
 double HashTable_get_max_load_factor(HashTable* this);
 double HashTable_get_current_load_factor(HashTable* this);
 void HashTable_map(HashTable* this, void (*func)(void* ));

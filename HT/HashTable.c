@@ -2,48 +2,48 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef unsigned int uint;
 typedef struct Node Node;
 
-const uint DEF_SIZE = 509;
+const uint32_t DEF_SIZE = 509;
 const double DEF_MAX_LOAD_FACTOR = 0.7;
 
 struct Node {
     char* key;
     void* data;
-    int deleted;
+    int32_t deleted;
 };
 
 struct HashTable {
-    uint table_size;
-    uint element_count;
-    uint taken_spaces;
+    uint32_t table_size;
+    uint32_t element_count;
+    uint32_t taken_spaces;
     double max_load_factor;
     Node **table;
+    uint32_t (*hash_function)(const char* , uint32_t);
 };
 
 struct HTIterator {
     HashTable* hashtable;
-    uint index;
+    uint32_t index;
 };
 
 struct HTKeyIterator {
     HashTable* hashtable;
-    uint index;
+    uint32_t index;
 };
 
 struct HTPairIterator {
     HashTable* hashtable;
-    uint index;
+    uint32_t index;
     HTPair pair;
 };
 
-static uint HashTable_hash(HashTable* this, const char* key){
-    static const uint HASH_MUTLIPLIER = 65599;
-    uint i = 0, hash_value = 0;
-    while(key[i])
-        hash_value = hash_value * HASH_MUTLIPLIER + key[i++];
-    return hash_value % this->table_size;
+static uint32_t def_hash_function(const char* key, uint32_t table_size){
+    static const uint32_t HASH_MUTLIPLIER = 65599;
+    uint32_t hash_value = 0;
+    while(*key)
+        hash_value = hash_value * HASH_MUTLIPLIER + *key++;
+    return hash_value % table_size;
 }
 
 static Node* Node_new(const char* key, const void* data){
@@ -56,7 +56,7 @@ static Node* Node_new(const char* key, const void* data){
 }
 
 static void HashTable_insert_node(HashTable* this, Node* node){
-    uint idx = HashTable_hash(this, node->key);
+    uint32_t idx = this->hash_function(node->key, this->table_size);
     Node** table = this->table;
     while(1){
         if(table[idx]){
@@ -75,13 +75,13 @@ static void HashTable_insert_node(HashTable* this, Node* node){
     }
 }
 
-static int HashTable_double_size(HashTable* this){
+static int32_t HashTable_double_size(HashTable* this){
     HashTable* new_ht = HashTable_new_init_size(this->table_size * 2);
-    uint table_size = this->table_size;
-    uint element_count = this->taken_spaces;
-    uint elements_visited = 0;
+    uint32_t table_size = this->table_size;
+    uint32_t element_count = this->taken_spaces;
+    uint32_t elements_visited = 0;
     Node** old_table = this->table;
-    for(uint i=0; (elements_visited<element_count) && (i<table_size); i++){
+    for(uint32_t i=0; (elements_visited<element_count) && (i<table_size); i++){
         if(old_table[i]){
             if(old_table[i]->deleted == 0)
                 HashTable_insert_node(new_ht, old_table[i]);
@@ -102,10 +102,11 @@ HashTable* HashTable_new(void){
     return HashTable_new_init_size(DEF_SIZE);
 }
 
-HashTable* HashTable_new_init_size(uint init_size){
+HashTable* HashTable_new_init_size(uint32_t init_size){
     HashTable* this = malloc(sizeof(HashTable));
     if(!this) 
         return NULL;
+    this->hash_function = def_hash_function;
     this->table_size = init_size;
     this->element_count = 0;
     this->taken_spaces = 0;
@@ -118,7 +119,11 @@ HashTable* HashTable_new_init_size(uint init_size){
     return this;
 }
 
-int HashTable_set_max_load_factor(HashTable* this, double max_load_factor){
+HashTable* HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size)) {
+    this->hash_function = new_hash_function;
+}
+
+int32_t HashTable_set_max_load_factor(HashTable* this, double max_load_factor){
     if(max_load_factor >= 1.0 || max_load_factor <= 0)
         return -1;
     this->max_load_factor = max_load_factor;
@@ -134,11 +139,11 @@ double HashTable_get_current_load_factor(HashTable* this){
 }
 
 void HashTable_destroy(HashTable* this){
-    uint table_size = this->table_size;
-    uint element_count = this->taken_spaces;
-    uint elements_visited = 0;
+    uint32_t table_size = this->table_size;
+    uint32_t element_count = this->taken_spaces;
+    uint32_t elements_visited = 0;
     Node** table = this->table;
-    for(uint i=0; (elements_visited<element_count) && (i<table_size); i++){
+    for(uint32_t i=0; (elements_visited<element_count) && (i<table_size); i++){
         if(table[i]){
             if(table[i]->deleted == 0)
                 free(table[i]->key);
@@ -151,11 +156,11 @@ void HashTable_destroy(HashTable* this){
 }
 
 void HashTable_clear(HashTable* this){
-    uint table_size = this->table_size;
-    uint element_count = this->taken_spaces;
-    uint elements_visited = 0;
+    uint32_t table_size = this->table_size;
+    uint32_t element_count = this->taken_spaces;
+    uint32_t elements_visited = 0;
     Node** table = this->table;
-    for(uint i=0; (elements_visited<element_count) && (i<table_size); i++){
+    for(uint32_t i=0; (elements_visited<element_count) && (i<table_size); i++){
         if(table[i]){
             if(table[i]->deleted == 0)
                 free(table[i]->key);
@@ -168,17 +173,17 @@ void HashTable_clear(HashTable* this){
     this->taken_spaces = 0;
 }
 
-uint HashTable_capacity(HashTable* this){
+uint32_t HashTable_capacity(HashTable* this){
     return this->table_size;
 }
 
-uint HashTable_element_count(HashTable* this){
+uint32_t HashTable_element_count(HashTable* this){
     return this->element_count;
 }
 
 static void** HashTable_get_val_ref(HashTable* this, const char* key){
-    uint idx = HashTable_hash(this, key);
-    uint visited = 0;
+    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t visited = 0;
     Node** table = this->table;
     while(visited < this->element_count){
         if(table[idx]){
@@ -194,7 +199,7 @@ static void** HashTable_get_val_ref(HashTable* this, const char* key){
     return NULL;
 }
 
-int HashTable_insert(HashTable* this, const char* key, const void* value){
+int32_t HashTable_insert(HashTable* this, const char* key, const void* value){
     if((double)this->taken_spaces / (double)this->table_size >= this->max_load_factor){
         if(HashTable_double_size(this) == -1)
             return -1;
@@ -214,8 +219,8 @@ int HashTable_insert(HashTable* this, const char* key, const void* value){
 }
 
 void* HashTable_get(HashTable* this, const char* key){
-    uint idx = HashTable_hash(this, key);
-    uint visited = 0;
+    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t visited = 0;
     Node** table = this->table;
     while(visited < this->element_count){
         if(table[idx]){
@@ -232,8 +237,8 @@ void* HashTable_get(HashTable* this, const char* key){
 }
 
 void* HashTable_remove(HashTable* this, const char* key){
-    uint idx = HashTable_hash(this, key);
-    uint visited = 0;
+    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t visited = 0;
     Node** table = this->table;
     while(visited < this->element_count){
         if(table[idx]){
@@ -254,9 +259,9 @@ void* HashTable_remove(HashTable* this, const char* key){
     return NULL;
 }
 
-int HashTable_contains(HashTable* this, const char* key){
-    uint idx = HashTable_hash(this, key);
-    uint visited = 0;
+int32_t HashTable_contains(HashTable* this, const char* key){
+    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t visited = 0;
     Node** table = this->table;
     while(visited < this->element_count){
         if(table[idx]){
