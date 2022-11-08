@@ -16,16 +16,18 @@ int main(int argc, const char** argv){
     HashTable_insert(ht, "d", &d);
     HashTable_insert(ht, "e", &e);
 
+    // =============================================
+
+    printf("========= Iterator =========\n");
+    HashTable_map(ht, map_func_triple);
     HTIterator* iter = HTIterator_new(ht);
     void* data;
     const char* key;
     while(data = HTIterator_next(iter))
         printf("%d\n", *(int*)data);
-    HashTable_map(ht, map_func_triple);
-    HTIterator_reset(iter);
-    while(data = HTIterator_next(iter))
-        printf("%d\n", *(int*)data);
     HTIterator_destroy(iter);
+
+    // =============================================
 
     printf("======= Key iterator =======\n");
     HTKeyIterator* key_iter = HTKeyIterator_new(ht);
@@ -33,7 +35,19 @@ int main(int argc, const char** argv){
         printf("%s\n", key);
     HTKeyIterator_destroy(key_iter);
     
-    
+    // =============================================
+
+    printf("======= For iterator =======\n");
+    int* data_i;
+    HT_for(ht, data_i)
+        *data_i += 50;
+
+    HashTable_map(ht, map_func_triple);
+
+    HT_for(ht, data_i)
+        printf("%d\n", *data_i);
+
+
     HashTable_destroy(ht);
     return 0;
 }

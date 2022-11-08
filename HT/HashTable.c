@@ -294,8 +294,9 @@ HTIterator* HTIterator_new(HashTable* hashtable){
     return this;
 }
 
-void HTIterator_destroy(HTIterator* this){
+void* HTIterator_destroy(HTIterator* this){
     free(this);
+    return NULL;
 }
 
 void* HTIterator_peak(HTIterator* this){

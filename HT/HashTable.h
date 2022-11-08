@@ -2,7 +2,6 @@
 #define _MY_HASH_TABLE_
 #include <inttypes.h>
 
-
 /* Types */
 typedef struct HTPair {
     const char* key;
@@ -34,10 +33,11 @@ void HashTable_map(HashTable* this, void (*func)(void* ));
 
 /* HTIterator methods */
 HTIterator* HTIterator_new(HashTable* hashtable);
-void HTIterator_destroy(HTIterator* this);
+void* HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
+#define HT_for(ht, data) for(HTIterator* it = HTIterator_new(ht); (data = HTIterator_next(it)) != NULL || HTIterator_destroy(it); )
 
 /* HTKeyIterator methods */
 HTKeyIterator* HTKeyIterator_new(HashTable* hashtable);
