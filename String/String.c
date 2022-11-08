@@ -15,7 +15,6 @@ struct StringIterator {
 };
 
 const uint DEF_SIZE = 20;               /* used by empty constructor */
-const uint DEF_EXPAND_ADDED_LEN = 100;  /* used when resizing string*/
 
 /* String methods */
 String* String_new(){
@@ -78,12 +77,11 @@ String* String_clone(const String* this){
 
 void String_destroy(String* this){
     free(this->c_str);
-    this->c_str = NULL;
     free(this);
 }
 
 static int String_expand(String* this, unsigned int new_len){
-    uint new_size = new_len + 1 + DEF_EXPAND_ADDED_LEN;
+    uint new_size = new_len + 1 + this->size * 2;
     char* new_c_str = realloc(this->c_str, new_size);
     if(!new_c_str)
         return -1;
