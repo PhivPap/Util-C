@@ -371,8 +371,9 @@ HTPairIterator* HTPairIterator_new(HashTable* hashtable){
     return this;
 }
 
-void HTPairIterator_destroy(HTPairIterator* this){
+void* HTPairIterator_destroy(HTPairIterator* this){
     free(this);
+    return NULL;
 }
 
 HTPair* HTPairIterator_peak(HTPairIterator* this){

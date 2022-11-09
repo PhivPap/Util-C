@@ -2,6 +2,17 @@
 #define _MY_HASH_TABLE_
 #include <inttypes.h>
 
+#define INV_ (void*)0xFFFFFFFFFFFFFFFF
+
+#define MERGE_(a,b)  a##b
+
+#define LABEL0_(a) MERGE_(_uniq0_, a)
+#define UNIQUE_NAME0 LABEL0_(__LINE__)
+
+#define LABEL1_(a) MERGE_(_uniq1_, a)
+#define UNIQUE_NAME1 LABEL1_(__LINE__)
+
+
 /* Types */
 typedef struct HTPair {
     const char* key;
@@ -37,7 +48,11 @@ void* HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
-#define HT_for(ht, data) for(HTIterator* it = HTIterator_new(ht); (data = HTIterator_next(it)) != NULL || HTIterator_destroy(it); )
+#define HT_for(ht, data) \
+for ( \
+    HTIterator* UNIQUE_NAME0 = HTIterator_new(ht); \
+    (data = HTIterator_next(UNIQUE_NAME0)) != NULL || HTIterator_destroy(UNIQUE_NAME0); \
+)
 
 /* HTKeyIterator methods */
 HTKeyIterator* HTKeyIterator_new(HashTable* hashtable);
@@ -48,10 +63,16 @@ void HTKeyIterator_reset(HTKeyIterator* this);
 
 /* HTPairIterator methods */
 HTPairIterator* HTPairIterator_new(HashTable* hashtable);
-void HTPairIterator_destroy(HTPairIterator* this);
+void* HTPairIterator_destroy(HTPairIterator* this);
 HTPair* HTPairIterator_peak(HTPairIterator* this);
 HTPair* HTPairIterator_next(HTPairIterator* this);
 void HTPairIterator_reset(HTPairIterator* this);
+#define HTPair_for(ht, key, val) \
+HTPair* UNIQUE_NAME0; \
+for ( \
+    HTPairIterator* UNIQUE_NAME1 = HTPairIterator_new(ht); \
+    ((UNIQUE_NAME0 = HTPairIterator_next(UNIQUE_NAME1)) != NULL && (key = UNIQUE_NAME0->key) != INV_ && (val = (typeof(val))UNIQUE_NAME0->value) != INV_) || HTPairIterator_destroy(UNIQUE_NAME1); \
+)
 
 
 

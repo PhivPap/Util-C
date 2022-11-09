@@ -39,13 +39,17 @@ int main(int argc, const char** argv){
 
     printf("======= For iterator =======\n");
     int* data_i;
-    HT_for(ht, data_i)
+    HT_for(ht, data_i) 
         *data_i += 50;
 
     HashTable_map(ht, map_func_triple);
 
     HT_for(ht, data_i)
         printf("%d\n", *data_i);
+
+    printf("===== Pair For iterator ====\n");
+    HTPair_for(ht, key, data_i)
+        printf("%s - %d\n", key, *data_i);
 
 
     HashTable_destroy(ht);
