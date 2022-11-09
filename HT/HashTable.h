@@ -48,10 +48,10 @@ void* HTIterator_destroy(HTIterator* this);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
-#define HT_for(ht, data) \
+#define HT_for(ht, val) \
 for ( \
     HTIterator* UNIQUE_NAME0 = HTIterator_new(ht); \
-    (data = HTIterator_next(UNIQUE_NAME0)) != NULL || HTIterator_destroy(UNIQUE_NAME0); \
+    (val = HTIterator_next(UNIQUE_NAME0)) != NULL || HTIterator_destroy(UNIQUE_NAME0); \
 )
 
 /* HTKeyIterator methods */
@@ -60,6 +60,11 @@ void HTKeyIterator_destroy(HTKeyIterator* this);
 const char* HTKeyIterator_peak(HTKeyIterator* this);
 const char* HTKeyIterator_next(HTKeyIterator* this);
 void HTKeyIterator_reset(HTKeyIterator* this);
+#define HTKey_for(ht, key) \
+for ( \
+    HTIterator* UNIQUE_NAME0 = HTKeyIterator_new(ht); \
+    (key = HTKeyIterator_next(UNIQUE_NAME0)) != NULL || HTKeyIterator_destroy(UNIQUE_NAME0); \
+)
 
 /* HTPairIterator methods */
 HTPairIterator* HTPairIterator_new(HashTable* hashtable);
