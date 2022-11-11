@@ -3,6 +3,11 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#define MERGE_(a,b)  a##b
+
+#define LABEL0_(a) MERGE_(_uniq0_, a)
+#define UNIQUE_NAME LABEL0_(__LINE__)
+
 /* Opaque types */
 typedef struct Vector Vector;
 typedef struct VIterator VIterator;
@@ -25,7 +30,7 @@ void VIterator_destroy(VIterator* this);
 void* VIterator_peak(VIterator* this);
 void* VIterator_next(VIterator* this);
 int _VIterator_destroy(VIterator* this);
-#define V_for(vec, val) for (VIterator* it = VIterator_new(vec); (val = VIterator_next(it)) != NULL || _VIterator_destroy(it); )
+#define V_for(vec, val) for (VIterator* UNIQUE_NAME = VIterator_new(vec); (val = VIterator_next(UNIQUE_NAME)) != NULL || _VIterator_destroy(UNIQUE_NAME); )
 
 
 
