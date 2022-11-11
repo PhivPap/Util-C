@@ -1,6 +1,7 @@
 #ifndef _MY_VECTOR_
 #define _MY_VECTOR_
 #include <inttypes.h>
+#include <stdbool.h>
 
 /* Opaque types */
 typedef struct Vector Vector;
@@ -23,7 +24,8 @@ VIterator* VIterator_new(Vector* vector);
 void VIterator_destroy(VIterator* this);
 void* VIterator_peak(VIterator* this);
 void* VIterator_next(VIterator* this);
-
+int _VIterator_destroy(VIterator* this);
+#define V_for(vec, val) for (VIterator* it = VIterator_new(vec); (val = VIterator_next(it)) != NULL || _VIterator_destroy(it); )
 
 
 

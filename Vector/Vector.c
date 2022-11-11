@@ -142,3 +142,8 @@ void* VIterator_next(VIterator* this){
 void VIterator_reset(VIterator* this){
     this->index = 0;
 }
+
+int _VIterator_destroy(VIterator* this) {
+    VIterator_destroy(this);
+    return 0;
+}

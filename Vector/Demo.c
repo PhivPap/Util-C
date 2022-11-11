@@ -2,10 +2,7 @@
 
 #include "Vector.h"
 
-
-
-
-void main(){
+int main(int argc, const char* argv[]){
     Vector* vec = Vector_new_init_size(2);
     int a = 2, b = 3, c = 23, d = 100, e = 99999;
     Vector_pushback(vec, &a);
@@ -17,10 +14,15 @@ void main(){
 
 
     VIterator* iter = VIterator_new(vec);
-    void* data;
+    int* data;
     while(data = VIterator_next(iter))
-        printf("%d\n", *(int*)data);
-
+        *data += 10;
     VIterator_destroy(iter);
+
+    V_for(vec, data)
+        printf("%d\n", *data);
+
     Vector_destroy(vec);
+
+    return 0;
 }
