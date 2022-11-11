@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "Vector.h"
 
 
@@ -143,7 +144,7 @@ void VIterator_reset(VIterator* this){
     this->index = 0;
 }
 
-int _VIterator_destroy(VIterator* this) {
+bool _VIterator_destroy(VIterator* this) {
     VIterator_destroy(this);
-    return 0;
+    return false;
 }
