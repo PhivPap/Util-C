@@ -61,24 +61,6 @@ void List_clear(List* this){
     this->tail = NULL;
 }
 
-// void List_clear_free(List* this){
-//     ListNode* prev = this->head;
-//     if(prev == NULL)
-//         return;
-//     ListNode* node = prev->next;
-//     while(node != NULL){
-//         free(prev->data);
-//         free(prev);
-//         prev = node;
-//         node = node->next;
-//     }
-//     free(prev->data);
-//     free(prev);
-//     this->length = 0;
-//     this->head = NULL;
-//     this->tail = NULL;
-// }
-
 int List_push_front(List* this, const void* data){
     ListNode* node = malloc(sizeof(ListNode));
     if(!node)
@@ -178,7 +160,7 @@ void* List_remove(List* this, unsigned int index){
 void List_map(List* this, void (*func)(void* )){
     ListIterator* iter = ListIterator_new(this);
     void* list_item;
-    while(list_item = ListIterator_next(iter))
+    while((list_item = ListIterator_next(iter)) != NULL)
         func(list_item);
     ListIterator_destroy(iter);
 }
