@@ -79,7 +79,7 @@ JsonObj* JsonObj_new_dict(void){
     JsonObj* this = malloc(sizeof(JsonObj));
     if(!this)
         return NULL;
-    HashTable* ht = HashTable_new_with_size(8);
+    HashTable* ht = HashTable_new_init_size(8);
     if(!ht){
         free(this);
         return NULL;
@@ -230,7 +230,7 @@ void JsonObj_dict_deep_clear(JsonObj* jdict){
     assert(jdict->type == JDict);
     HTPairIterator* iter = HTPairIterator_new(jdict->dict);
     HTPair* pair;
-    while(pair = HTPairIterator_next(iter))
+    while((pair = HTPairIterator_next(iter)) != NULL)
         JsonObj_deep_destroy((JsonObj*)pair->value);
     HTPairIterator_destroy(iter);
     HashTable_clear(jdict->dict);
@@ -245,7 +245,7 @@ void JsonObj_dict_map(JsonObj* jdict, void (*func)(JsonObj* )){
     assert(jdict->type == JDict);
     JDictIter* iter = JDictIter_new(jdict);
     JDictPair* jdict_pair;
-    while(jdict_pair = JDictIter_next(iter))
+    while((jdict_pair = JDictIter_next(iter)) != NULL)
         func(jdict_pair->jsonobj);
     JDictIter_destroy(iter);
 }
@@ -302,7 +302,7 @@ static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth)
         HTPair* pair;
         uint total_pairs = HashTable_element_count(this->dict);
         uint pair_num = 1;
-        while(pair = HTPairIterator_next(iter)){
+        while((pair = HTPairIterator_next(iter)) != NULL){
             print_indentation(fp, depth + 1);
             fprintf(fp, "\"%s\" : ", pair->key);
             JsonObj_print((JsonObj*)pair->value, fp, depth + 1);
@@ -368,7 +368,7 @@ char* JsonObj_sprint(const JsonObj* this){
 // if *sp is not an 'empty char' the the function does nothing
 static inline void skip_empty(const char** sp){
     char c;
-    while(c = **sp){
+    while((c = **sp) != 0){
         switch(c){
         case ' ':
         case '\n':
@@ -391,7 +391,7 @@ static char* parse_str(const char** sp){
     const char* str_start = *sp;
     char c, prev = 0;
     uint len = 0;
-    while(c = **sp){
+    while((c = **sp) != 0){
         if((c == '\\') && (prev == '\\'))
             prev = 0;
         else if((c == '"') && (prev != '\\')){
@@ -416,7 +416,7 @@ static char* read_token(const char** sp){
     const char* token_start = *sp;
     uint len = 0;
     char c;
-    while(c = **sp){
+    while((c = **sp) != 0){
         switch(c){
         case ' ':
         case '\t':

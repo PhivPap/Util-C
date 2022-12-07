@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include "Json.h"
 
-// gcc DemoWrite.c Json.c ../List/List.c ../HT/HashTable.c
-
-void main(){
+int main(int argc, const char* argv[]){
     //TODO print: escape " & string version.
 
     JsonObj* json = JsonObj_new_dict();

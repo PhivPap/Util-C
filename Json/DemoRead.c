@@ -14,7 +14,7 @@ void gracefully_exit(const char* msg){
 void print_usernames_unsafe(JsonObj* json){
     JArrayIter* users_iter = JArrayIter_new(JsonObj_dict_get(json, "users"));
     JsonObj* user;
-    while(user = JArrayIter_next(users_iter))
+    while((user = JArrayIter_next(users_iter)) != NULL)
         printf("%s\n", JsonObj_get_string(JsonObj_dict_get(user, "username")));
     JarrayIter_destroy(users_iter);
 }
@@ -25,7 +25,7 @@ void print_usernames_safe(JsonObj* json){
         gracefully_exit("Missing 'users' array in json.");
     JArrayIter* users_iter = JArrayIter_new(users);
     JsonObj* user;
-    while(user = JArrayIter_next(users_iter)){
+    while((user = JArrayIter_next(users_iter)) != NULL){
         if(JsonObj_get_type(user) != JDict)
             gracefully_exit("Array 'users' contains non-dictionary objects.");
         JsonObj* username = JsonObj_dict_get(user, "username");
@@ -36,11 +36,11 @@ void print_usernames_safe(JsonObj* json){
     JarrayIter_destroy(users_iter);
 }
 
-void main(){
+int main(int argc, const char* argv[]){
     JsonObj* json = JsonObj_parse_file(json_file_path);
     if(!json){
         printf("Failed to parse '%s'\n", json_file_path);
-        return;
+        return -1;
     }
 
     //print_usernames_safe(json);
