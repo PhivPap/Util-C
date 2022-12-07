@@ -148,3 +148,22 @@ bool _VIterator_destroy(VIterator* this) {
     VIterator_destroy(this);
     return false;
 }
+
+void Vector_serialize(Vector* this, FILE* fp, void (*serialize_item)(FILE* fp, void* item)) {
+    void* item;
+    fwrite(&(this->element_count), sizeof(this->element_count), 1, fp);
+    V_for(this, item) {
+        serialize_item(fp, item);
+    }
+}
+
+Vector* Vector_deserialize(FILE* fp, void (*deserialize_item)(FILE* fp, void** item_ref)) {
+    uint32_t element_count;
+    fread(&element_count, sizeof(element_count), 1, fp);
+    Vector* this = Vector_new_init_size(element_count);
+    void** table = Vector_data(this);
+    for (uint32_t i = 0; i < element_count; i++)
+        deserialize_item(fp, table + i);
+    this->element_count = element_count;
+    return this;
+}

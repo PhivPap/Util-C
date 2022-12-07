@@ -2,6 +2,7 @@
 #define _MY_VECTOR_
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define MERGE_(a,b)  a##b
 
@@ -12,7 +13,7 @@
 typedef struct Vector Vector;
 typedef struct VIterator VIterator;
 
-/* Vector functions */
+/* Vector methods */
 Vector* Vector_new(void);
 Vector* Vector_new_init_size(uint32_t size);
 void Vector_destroy(Vector* this);
@@ -24,7 +25,7 @@ void* Vector_front(Vector* this);
 void* Vector_back(Vector* this);
 void Vector_map(Vector* this, void (*func)(void *));
 
-/* VIterator functions */
+/* VIterator methods */
 VIterator* VIterator_new(Vector* vector);
 void VIterator_destroy(VIterator* this);
 void* VIterator_peak(VIterator* this);
@@ -32,6 +33,8 @@ void* VIterator_next(VIterator* this);
 bool _VIterator_destroy(VIterator* this);
 #define V_for(vec, val) for (VIterator* UNIQUE_NAME = VIterator_new(vec); (val = VIterator_next(UNIQUE_NAME)) != NULL || _VIterator_destroy(UNIQUE_NAME); )
 
-
+/* (De)serialization methods */
+void Vector_serialize(Vector* this, FILE* fp, void (*serialize_item)(FILE* fp, void* item));
+Vector* Vector_deserialize(FILE* fp, void (*deserialize_item)(FILE* fp, void** item_ref));
 
 #endif
