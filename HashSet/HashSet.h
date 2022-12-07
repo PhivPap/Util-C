@@ -14,7 +14,7 @@ typedef struct HSIterator HSIterator;
 /* HashSet methods */
 HashSet* HashSet_new(void);
 HashSet* HashSet_new_init_size(uint32_t init_size);
-HashSet* HashSet_set_hash_function(HashSet* this, uint32_t (*new_hash_function)(const void* data, uint32_t table_size));
+void HashSet_set_hash_function(HashSet* this, uint32_t (*new_hash_function)(const void* data, uint32_t table_size));
 void HashSet_destroy(HashSet* this);
 void HashSet_clear(HashSet* this);
 uint32_t HashSet_capacity(HashSet* this);

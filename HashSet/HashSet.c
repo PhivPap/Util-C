@@ -106,7 +106,7 @@ HashSet* HashSet_new_init_size(uint32_t init_size){
     return this;
 }
 
-HashSet* HashSet_set_hash_function(HashSet* this, uint32_t (*new_hash_function)(const void* data, uint32_t table_size)) {
+void HashSet_set_hash_function(HashSet* this, uint32_t (*new_hash_function)(const void* data, uint32_t table_size)) {
     this->hash_function = new_hash_function;
 }
 
@@ -247,7 +247,7 @@ int32_t HashSet_contains(HashSet* this, void* key){
 void HashSet_map(HashSet* this, void (*func)(void* )){
     HSIterator* iter = HSIterator_new(this);
     void* ht_elem;
-    while(ht_elem = HSIterator_next(iter))
+    while((ht_elem = HSIterator_next(iter)) != NULL)
         func(ht_elem);
     HSIterator_destroy(iter);
 }
