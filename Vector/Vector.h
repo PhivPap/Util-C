@@ -17,6 +17,8 @@ typedef struct VIterator VIterator;
 Vector* Vector_new(void);
 Vector* Vector_new_init_size(uint32_t size);
 void Vector_destroy(Vector* this);
+uint32_t Vector_size(Vector* this);
+uint32_t Vector_capacity(Vector* this);
 void Vector_clear(Vector* this);
 int Vector_pushback(Vector* this, const void* data);
 void* Vector_get(Vector* this, uint32_t index);

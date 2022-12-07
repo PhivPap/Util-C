@@ -54,6 +54,15 @@ void Vector_destroy(Vector* this){
     free(this);
 }
 
+uint32_t Vector_size(Vector* this) {
+    return this->element_count;
+}
+
+uint32_t Vector_capacity(Vector* this) {
+    return this->size;
+}
+
+
 void Vector_clear(Vector* this){
     for(int32_t idx = 0; idx < this->size; idx++)
         this->table[idx] = NULL;
