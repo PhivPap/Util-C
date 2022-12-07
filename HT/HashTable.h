@@ -2,8 +2,6 @@
 #define _MY_HASH_TABLE_
 #include <inttypes.h>
 
-#define INV_ (void*)0xFFFFFFFFFFFFFFFF
-
 #define MERGE_(a,b)  a##b
 
 #define LABEL0_(a) MERGE_(_uniq0_, a)
@@ -28,7 +26,7 @@ typedef struct HTKeyIterator HTKeyIterator;
 /* HashTable methods */
 HashTable* HashTable_new(void);
 HashTable* HashTable_new_init_size(uint32_t init_size);
-HashTable* HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size));
+void HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size));
 void HashTable_destroy(HashTable* this);
 void HashTable_clear(HashTable* this);
 uint32_t HashTable_capacity(HashTable* this);
@@ -76,7 +74,7 @@ void HTPairIterator_reset(HTPairIterator* this);
 HTPair* UNIQUE_NAME0; \
 for ( \
     HTPairIterator* UNIQUE_NAME1 = HTPairIterator_new(ht); \
-    ((UNIQUE_NAME0 = HTPairIterator_next(UNIQUE_NAME1)) != NULL && (key = UNIQUE_NAME0->key) != INV_ && (val = (typeof(val))UNIQUE_NAME0->value) != INV_) || HTPairIterator_destroy(UNIQUE_NAME1); \
+    ((UNIQUE_NAME0 = HTPairIterator_next(UNIQUE_NAME1)) != NULL && (key = UNIQUE_NAME0->key) && (val = (typeof(val))UNIQUE_NAME0->value)) || HTPairIterator_destroy(UNIQUE_NAME1); \
 )
 
 

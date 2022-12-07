@@ -119,7 +119,8 @@ HashTable* HashTable_new_init_size(uint32_t init_size){
     return this;
 }
 
-HashTable* HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size)) {
+// don't call if not empty :)
+void HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(const char* key, uint32_t table_size)) {
     this->hash_function = new_hash_function;
 }
 
@@ -280,7 +281,7 @@ int32_t HashTable_contains(HashTable* this, const char* key){
 void HashTable_map(HashTable* this, void (*func)(void* )){
     HTIterator* iter = HTIterator_new(this);
     void* ht_elem;
-    while(ht_elem = HTIterator_next(iter))
+    while((ht_elem = HTIterator_next(iter)) != NULL)
         func(ht_elem);
     HTIterator_destroy(iter);
 }

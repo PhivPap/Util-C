@@ -5,7 +5,6 @@ void map_func_triple(void* ht_elem){
     *(int*)ht_elem *= 3;
 }
 
-
 int main(int argc, const char** argv){
     int a = 2, b = 3, c = 10, d = 230, e = 1000;
     HashTable* ht = HashTable_new_init_size(20);
@@ -23,7 +22,7 @@ int main(int argc, const char** argv){
     HTIterator* iter = HTIterator_new(ht);
     void* data;
     const char* key;
-    while(data = HTIterator_next(iter))
+    while((data = HTIterator_next(iter)) != NULL)
         printf("%d\n", *(int*)data);
     HTIterator_destroy(iter);
 
@@ -31,7 +30,7 @@ int main(int argc, const char** argv){
 
     printf("======= Key iterator =======\n");
     HTKeyIterator* key_iter = HTKeyIterator_new(ht);
-    while (key = HTKeyIterator_next(key_iter))
+    while ((key = HTKeyIterator_next(key_iter)) != NULL)
         printf("%s\n", key);
     HTKeyIterator_destroy(key_iter);
     
