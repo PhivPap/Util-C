@@ -8,10 +8,10 @@ void byte_serializer(FILE* fp, void* byte) {
     fputc(*(char*)byte, fp);
 }
 
-void byte4_serializer(FILE* fp, void* word) {
+void word_serializer(FILE* fp, void* word) {
     fwrite(word, 4, 1, fp);
 }
 
-void byte8_serializer(FILE* fp, void* dword) {
+void dword_serializer(FILE* fp, void* dword) {
     fwrite(dword, 8, 1, fp);
 }
