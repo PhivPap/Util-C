@@ -16,18 +16,18 @@ struct VIterator {
 
 struct Vector {
     void** table;
-    int32_t size;
+    int32_t capacity;
     int32_t element_count;
 };
 
 static int Vector_expand(Vector* this){
-    void** new_table = calloc(this->size * 2, sizeof(void*));
+    void** new_table = calloc(this->capacity * 2, sizeof(void*));
     if(!new_table)
         return -1;
-    memcpy(new_table, this->table, this->size * sizeof(void*));
+    memcpy(new_table, this->table, this->capacity * sizeof(void*));
     free(this->table);
     this->table = new_table;
-    this->size *= 2;
+    this->capacity *= 2;
     return 0;
 }
 
@@ -39,7 +39,7 @@ Vector* Vector_new_init_size(unsigned int size){
     Vector* this = malloc(sizeof(Vector));
     if(!this)
         return NULL;
-    this->size = size;
+    this->capacity = size;
     this->element_count = 0;
     this->table = calloc(size, sizeof(void*));
     if (this->table == NULL) {
@@ -59,12 +59,11 @@ uint32_t Vector_size(Vector* this) {
 }
 
 uint32_t Vector_capacity(Vector* this) {
-    return this->size;
+    return this->capacity;
 }
 
-
 void Vector_clear(Vector* this){
-    for(int32_t idx = 0; idx < this->size; idx++)
+    for(int32_t idx = 0; idx < this->capacity; idx++)
         this->table[idx] = NULL;
     this->element_count = 0;
 }
@@ -77,7 +76,7 @@ int Vector_pushback(Vector* this, const void* data){
     if(!data)
         return -2;
     int32_t new_elem_idx = this->element_count;
-    if(new_elem_idx >= this->size)
+    if(new_elem_idx >= this->capacity)
         if(Vector_expand(this) == -1)
             return -1;
     this->table[new_elem_idx] = (void*)data;
@@ -115,7 +114,7 @@ void* Vector_back(Vector* this){
 void Vector_map(Vector* this, void (*func)(void *)){
     VIterator* iter = VIterator_new(this);
     void* vec_elem;
-    while(vec_elem = VIterator_next(iter))
+    while((vec_elem = VIterator_next(iter)) != NULL)
         func(vec_elem);
     VIterator_destroy(iter);
 }
@@ -158,21 +157,27 @@ bool _VIterator_destroy(VIterator* this) {
     return false;
 }
 
-void Vector_serialize(Vector* this, FILE* fp, void (*serialize_item)(FILE* fp, void* item)) {
+void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item)) {
     void* item;
     fwrite(&(this->element_count), sizeof(this->element_count), 1, fp);
-    V_for(this, item) {
-        serialize_item(fp, item);
-    }
+    V_for(this, item) 
+        item_serializer(fp, item);
 }
 
-Vector* Vector_deserialize(FILE* fp, void (*deserialize_item)(FILE* fp, void** item_ref)) {
+Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp)) {
     uint32_t element_count;
     fread(&element_count, sizeof(element_count), 1, fp);
     Vector* this = Vector_new_init_size(element_count);
-    void** table = Vector_data(this);
-    for (uint32_t i = 0; i < element_count; i++)
-        deserialize_item(fp, table + i);
+    if (this == NULL)
+        return NULL;
+
+    for (uint32_t i = 0; i < element_count; i++) {
+        void* item = item_deserializer(fp);
+        if (item != NULL)
+            Vector_pushback(this, item);
+        // else
+        //     set status to ??
+    }
     this->element_count = element_count;
     return this;
 }

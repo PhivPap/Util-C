@@ -15,7 +15,7 @@ int main(int argc, const char* argv[]){
 
     VIterator* iter = VIterator_new(vec);
     int* data;
-    while(data = VIterator_next(iter))
+    while((data = VIterator_next(iter)) != NULL)
         *data += 10;
     VIterator_destroy(iter);
 

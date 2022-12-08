@@ -36,7 +36,7 @@ bool _VIterator_destroy(VIterator* this);
 #define V_for(vec, val) for (VIterator* UNIQUE_NAME = VIterator_new(vec); (val = VIterator_next(UNIQUE_NAME)) != NULL || _VIterator_destroy(UNIQUE_NAME); )
 
 /* (De)serialization methods */
-void Vector_serialize(Vector* this, FILE* fp, void (*serialize_item)(FILE* fp, void* item));
-Vector* Vector_deserialize(FILE* fp, void (*deserialize_item)(FILE* fp, void** item_ref));
+void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item));
+Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 
 #endif

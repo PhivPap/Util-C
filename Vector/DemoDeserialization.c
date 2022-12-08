@@ -1,14 +1,8 @@
 #include "Vector.h"
+#include "../Serialization/deserializers.h"
 #include <stdlib.h>
 
 const char* vec_bin_path = "vec.bin";
-
-void string_deserializer(FILE* fp, void** str_ref) {
-    char* str = NULL;
-    size_t len = 0;
-    getdelim(&str, &len, '\0', fp);
-    *str_ref = str;
-}
 
 int main(int argc, const char** argv) {
     FILE* fp = fopen(vec_bin_path, "r");

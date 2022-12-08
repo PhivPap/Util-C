@@ -1,4 +1,5 @@
 #include "Vector.h"
+#include "../Serialization/serializers.h"
 
 const char* vec_bin_path = "vec.bin";
 
@@ -13,10 +14,6 @@ void fill_vector(Vector* vec) {
     Vector_pushback(vec, "parade");
     Vector_pushback(vec, "stretch");
     Vector_pushback(vec, "landlord");
-}
-
-void string_serializer(FILE* fp, void* str) {
-    fprintf(fp, "%s%c", (char*)str, '\0');
 }
 
 int main(int argc, const char** argv) {
