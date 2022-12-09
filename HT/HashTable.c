@@ -14,8 +14,8 @@ struct Node {
 };
 
 struct HashTable {
-    uint32_t table_size;
-    uint32_t element_count;
+    uint32_t capacity;
+    uint32_t size;
     uint32_t taken_spaces;
     double max_load_factor;
     Node **table;
@@ -56,7 +56,7 @@ static Node* Node_new(const char* key, const void* data){
 }
 
 static void HashTable_insert_node(HashTable* this, Node* node){
-    uint32_t idx = this->hash_function(node->key, this->table_size);
+    uint32_t idx = this->hash_function(node->key, this->capacity);
     Node** table = this->table;
     while(1){
         if(table[idx]){
@@ -71,13 +71,13 @@ static void HashTable_insert_node(HashTable* this, Node* node){
             break;
         }
         idx++;
-        idx = idx % this->table_size;
+        idx = idx % this->capacity;
     }
 }
 
 static int32_t HashTable_double_size(HashTable* this){
-    HashTable* new_ht = HashTable_new_init_size(this->table_size * 2);
-    uint32_t table_size = this->table_size;
+    HashTable* new_ht = HashTable_new_init_size(this->capacity * 2);
+    uint32_t table_size = this->capacity;
     uint32_t element_count = this->taken_spaces;
     uint32_t elements_visited = 0;
     Node** old_table = this->table;
@@ -92,8 +92,8 @@ static int32_t HashTable_double_size(HashTable* this){
     }
     free(old_table);
     this->table = new_ht->table;
-    this->table_size = new_ht->table_size;
-    this->taken_spaces = this->element_count;
+    this->capacity = new_ht->capacity;
+    this->taken_spaces = this->size;
     free(new_ht);
     return 0;
 }
@@ -107,8 +107,8 @@ HashTable* HashTable_new_init_size(uint32_t init_size){
     if(!this) 
         return NULL;
     this->hash_function = def_hash_function;
-    this->table_size = init_size;
-    this->element_count = 0;
+    this->capacity = init_size;
+    this->size = 0;
     this->taken_spaces = 0;
     this->max_load_factor = DEF_MAX_LOAD_FACTOR;
     this->table = calloc(init_size, sizeof(Node*));
@@ -136,11 +136,11 @@ double HashTable_get_max_load_factor(HashTable* this){
 }
 
 double HashTable_get_current_load_factor(HashTable* this){
-    return (double)this->taken_spaces / (double)this->table_size;
+    return (double)this->taken_spaces / (double)this->capacity;
 }
 
 void HashTable_destroy(HashTable* this){
-    uint32_t table_size = this->table_size;
+    uint32_t table_size = this->capacity;
     uint32_t element_count = this->taken_spaces;
     uint32_t elements_visited = 0;
     Node** table = this->table;
@@ -157,7 +157,7 @@ void HashTable_destroy(HashTable* this){
 }
 
 void HashTable_clear(HashTable* this){
-    uint32_t table_size = this->table_size;
+    uint32_t table_size = this->capacity;
     uint32_t element_count = this->taken_spaces;
     uint32_t elements_visited = 0;
     Node** table = this->table;
@@ -170,23 +170,23 @@ void HashTable_clear(HashTable* this){
             elements_visited++;
         }
     }
-    this->element_count = 0;
+    this->size = 0;
     this->taken_spaces = 0;
 }
 
 uint32_t HashTable_capacity(HashTable* this){
-    return this->table_size;
+    return this->capacity;
 }
 
-uint32_t HashTable_element_count(HashTable* this){
-    return this->element_count;
+uint32_t HashTable_size(HashTable* this){
+    return this->size;
 }
 
 static void** HashTable_get_val_ref(HashTable* this, const char* key){
-    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t idx = this->hash_function(key, this->capacity);
     uint32_t visited = 0;
     Node** table = this->table;
-    while(visited < this->element_count){
+    while(visited < this->size){
         if(table[idx]){
             if((table[idx]->deleted == 0) && strcmp(key, table[idx]->key) == 0)
                 return &(table[idx]->data);
@@ -195,13 +195,13 @@ static void** HashTable_get_val_ref(HashTable* this, const char* key){
             break;
         visited++;
         idx++;
-        idx = idx % this->table_size;
+        idx = idx % this->capacity;
     }
     return NULL;
 }
 
 int32_t HashTable_insert(HashTable* this, const char* key, const void* value){
-    if((double)this->taken_spaces / (double)this->table_size >= this->max_load_factor){
+    if((double)this->taken_spaces / (double)this->capacity >= this->max_load_factor){
         if(HashTable_double_size(this) == -1)
             return -1;
     }
@@ -214,16 +214,16 @@ int32_t HashTable_insert(HashTable* this, const char* key, const void* value){
     if(!new_node)
         return -1;
     HashTable_insert_node(this, new_node);
-    this->element_count++;
+    this->size++;
     this->taken_spaces++;
     return 0;
 }
 
 void* HashTable_get(HashTable* this, const char* key){
-    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t idx = this->hash_function(key, this->capacity);
     uint32_t visited = 0;
     Node** table = this->table;
-    while(visited < this->element_count){
+    while(visited < this->size){
         if(table[idx]){
             if((table[idx]->deleted == 0) && strcmp(key, table[idx]->key) == 0)
                 return table[idx]->data;
@@ -232,22 +232,22 @@ void* HashTable_get(HashTable* this, const char* key){
             break;
         visited++;
         idx++;
-        idx = idx % this->table_size;
+        idx = idx % this->capacity;
     }
     return NULL;
 }
 
 void* HashTable_remove(HashTable* this, const char* key){
-    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t idx = this->hash_function(key, this->capacity);
     uint32_t visited = 0;
     Node** table = this->table;
-    while(visited < this->element_count){
+    while(visited < this->size){
         if(table[idx]){
             if((table[idx]->deleted == 0) && strcmp(key, table[idx]->key) == 0){
                 void* data = table[idx]->data;
                 free(table[idx]->key);
                 table[idx]->deleted = 1;
-                this->element_count--;
+                this->size--;
                 return data;
             }
         }
@@ -255,16 +255,16 @@ void* HashTable_remove(HashTable* this, const char* key){
             break;
         visited++;
         idx++;
-        idx = idx % this->table_size;
+        idx = idx % this->capacity;
     }
     return NULL;
 }
 
 int32_t HashTable_contains(HashTable* this, const char* key){
-    uint32_t idx = this->hash_function(key, this->table_size);
+    uint32_t idx = this->hash_function(key, this->capacity);
     uint32_t visited = 0;
     Node** table = this->table;
-    while(visited < this->element_count){
+    while(visited < this->size){
         if(table[idx]){
             if((table[idx]->deleted == 0) && strcmp(key, table[idx]->key) == 0)
                 return 1;
@@ -273,7 +273,7 @@ int32_t HashTable_contains(HashTable* this, const char* key){
             break;
         visited++;
         idx++;
-        idx = idx % this->table_size;
+        idx = idx % this->capacity;
     }
     return 0;
 }
@@ -284,6 +284,35 @@ void HashTable_map(HashTable* this, void (*func)(void* )){
     while((ht_elem = HTIterator_next(iter)) != NULL)
         func(ht_elem);
     HTIterator_destroy(iter);
+}
+
+void HashTable_serialize(HashTable* this, FILE* fp, void (*value_serializer)(FILE* fp, void* value)) {
+    const char* key;
+    void* value;
+    fwrite(&(this->size), sizeof(this->size), 1, fp);
+    HTPair_for(this, key, value) {
+        fprintf(fp, "%s%c", (char*)key, '\0');
+        value_serializer(fp, value);
+    }
+}
+
+HashTable* HashTable_deserialize(FILE* fp, void* (*value_deserializer)(FILE* fp)) {
+    uint32_t element_count;
+    fread(&element_count, sizeof(element_count), 1, fp);
+    HashTable* this = HashTable_new_init_size(element_count * (1.0 / DEF_MAX_LOAD_FACTOR) + 5);
+    if (this == NULL)
+        return NULL;
+    
+    char* key = NULL;
+    size_t key_len = 0;
+    for (uint32_t i = 0; i < element_count; i++) {
+        getdelim(&key, &key_len, '\0', fp);
+        if (key != NULL) 
+            HashTable_insert(this, key, value_deserializer(fp));
+        // else
+        //     set status to ??
+    }
+    return this;
 }
 
 HTIterator* HTIterator_new(HashTable* hashtable){
@@ -302,7 +331,7 @@ void* HTIterator_destroy(HTIterator* this){
 
 void* HTIterator_peak(HTIterator* this){
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index];
         if((node != NULL) && (node->deleted == 0))
             return node->data;
@@ -313,7 +342,7 @@ void* HTIterator_peak(HTIterator* this){
 
 void* HTIterator_next(HTIterator* this){
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index++];
         if((node != NULL) && (node->deleted == 0))
             return node->data;
@@ -340,7 +369,7 @@ void HTKeyIterator_destroy(HTKeyIterator* this) {
 
 const char* HTKeyIterator_peak(HTKeyIterator* this) {
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index];
         if((node != NULL) && (node->deleted == 0))
             return node->key;
@@ -351,7 +380,7 @@ const char* HTKeyIterator_peak(HTKeyIterator* this) {
 
 const char* HTKeyIterator_next(HTKeyIterator* this) {
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index++];
         if((node != NULL) && (node->deleted == 0))
             return node->key;
@@ -379,7 +408,7 @@ void* HTPairIterator_destroy(HTPairIterator* this){
 
 HTPair* HTPairIterator_peak(HTPairIterator* this){
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index];
         if((node != NULL) && (node->deleted == 0)){
             this->pair.key = node->key;
@@ -393,7 +422,7 @@ HTPair* HTPairIterator_peak(HTPairIterator* this){
 
 HTPair* HTPairIterator_next(HTPairIterator* this){
     Node* node;
-    while(this->index < this->hashtable->table_size){
+    while(this->index < this->hashtable->capacity){
         node = this->hashtable->table[this->index++];
         if((node != NULL) && (node->deleted == 0)){
             this->pair.key = node->key;

@@ -1,6 +1,7 @@
 #ifndef _MY_HASH_TABLE_
 #define _MY_HASH_TABLE_
 #include <inttypes.h>
+#include <stdio.h>
 
 #define MERGE_(a,b)  a##b
 
@@ -30,7 +31,7 @@ void HashTable_set_hash_function(HashTable* this, uint32_t (*new_hash_function)(
 void HashTable_destroy(HashTable* this);
 void HashTable_clear(HashTable* this);
 uint32_t HashTable_capacity(HashTable* this);
-uint32_t HashTable_element_count(HashTable* this);
+uint32_t HashTable_size(HashTable* this);
 int32_t HashTable_contains(HashTable* this, const char* key);
 int32_t HashTable_insert(HashTable* this, const char* key, const void* value);
 void* HashTable_get(HashTable* this, const char* key);
@@ -39,6 +40,8 @@ int32_t HashTable_set_max_load_factor(HashTable* this, double max_load_factor);
 double HashTable_get_max_load_factor(HashTable* this);
 double HashTable_get_current_load_factor(HashTable* this);
 void HashTable_map(HashTable* this, void (*func)(void* ));
+void HashTable_serialize(HashTable* this, FILE* fp, void (*value_serializer)(FILE* fp, void* value));
+HashTable* HashTable_deserialize(FILE* fp, void* (*value_deserializer)(FILE* fp));
 
 /* HTIterator methods */
 HTIterator* HTIterator_new(HashTable* hashtable);

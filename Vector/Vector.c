@@ -178,6 +178,5 @@ Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp)) {
         // else
         //     set status to ??
     }
-    this->element_count = element_count;
     return this;
 }

@@ -26,6 +26,8 @@ int Vector_set(Vector* this, const void* data, uint32_t index);
 void* Vector_front(Vector* this);
 void* Vector_back(Vector* this);
 void Vector_map(Vector* this, void (*func)(void *));
+void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item));
+Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 
 /* VIterator methods */
 VIterator* VIterator_new(Vector* vector);
@@ -35,8 +37,5 @@ void* VIterator_next(VIterator* this);
 bool _VIterator_destroy(VIterator* this);
 #define V_for(vec, val) for (VIterator* UNIQUE_NAME = VIterator_new(vec); (val = VIterator_next(UNIQUE_NAME)) != NULL || _VIterator_destroy(UNIQUE_NAME); )
 
-/* (De)serialization methods */
-void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item));
-Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 
 #endif

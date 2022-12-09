@@ -24,7 +24,7 @@ void print_ht(HashTable* ht) {
         avg_val += *val;
         printf("%s: %d\n", key, *val);
     }
-    printf("Average score: %.2f\n", (double)avg_val / HashTable_element_count(ht)); // unsafe div :O
+    printf("Average score: %.2f\n", (double)avg_val / HashTable_size(ht)); // unsafe div :O
 }
 
 
