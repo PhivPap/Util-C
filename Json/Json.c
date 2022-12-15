@@ -300,7 +300,7 @@ static inline void JsonObj_dict_print(const JsonObj* this, FILE* fp, uint depth)
     else {
         fprintf(fp, "{\n");
         HTPair* pair;
-        uint total_pairs = HashTable_element_count(this->dict);
+        uint total_pairs = HashTable_size(this->dict);
         uint pair_num = 1;
         while((pair = HTPairIterator_next(iter)) != NULL){
             print_indentation(fp, depth + 1);
@@ -695,7 +695,7 @@ JsonObj* JsonObj_array_get(const JsonObj* jarray, unsigned int index){
 
 unsigned int JsonObj_dict_size(const JsonObj* jdict){
     assert(jdict->type == JDict);
-    return HashTable_element_count(jdict->dict);
+    return HashTable_size(jdict->dict);
 }
 
 JsonObj* JsonObj_dict_get(const JsonObj* jdict, const char* key){
