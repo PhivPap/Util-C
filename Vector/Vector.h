@@ -4,10 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define MERGE_(a,b)  a##b
-
-#define LABEL0_(a) MERGE_(_uniq0_, a)
-#define UNIQUE_NAME LABEL0_(__LINE__)
+#define _MERGE_(prefix, num) prefix##num
+#define _LABEL_(num) _MERGE_(_uniq_, num)
+#define _UNIQUE_ID_ _LABEL_(__COUNTER__)
 
 /* Opaque types */
 typedef struct Vector Vector;
@@ -29,13 +28,15 @@ void Vector_map(Vector* this, void (*func)(void *));
 void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item));
 Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 
-/* VIterator methods */
+/* VIterator methods + macro */
 VIterator* VIterator_new(Vector* vector);
 void VIterator_destroy(VIterator* this);
 void* VIterator_peak(VIterator* this);
 void* VIterator_next(VIterator* this);
 bool _VIterator_destroy(VIterator* this);
-#define V_for(vec, val) for (VIterator* UNIQUE_NAME = VIterator_new(vec); (val = VIterator_next(UNIQUE_NAME)) != NULL || _VIterator_destroy(UNIQUE_NAME); )
+
+#define _V_for_(_vec, _val, unique_id) for (VIterator* unique_id = VIterator_new(_vec); (_val = VIterator_next(unique_id)) != NULL || _VIterator_destroy(unique_id); )
+#define V_for(vec, val) _V_for_(vec, val, _UNIQUE_ID_)
 
 
 #endif

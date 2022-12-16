@@ -3,9 +3,9 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define MERGE_(a,b)  a##b
-#define LABEL0_(a) MERGE_(_uniq0_, a)
-#define UNIQUE_NAME LABEL0_(__LINE__)
+#define _MERGE_(prefix, num) prefix##num
+#define _LABEL_(num) _MERGE_(_uniq_, num)
+#define _UNIQUE_ID_ _LABEL_(__COUNTER__)
 
 /* Opaque types */
 typedef struct HashSet HashSet;
@@ -21,22 +21,22 @@ uint32_t HashSet_capacity(HashSet* this);
 uint32_t HashSet_element_count(HashSet* this);
 int32_t HashSet_contains(HashSet* this, void* data);
 int32_t HashSet_insert(HashSet* this, void* data);
-// void* HashSet_get(HashSet* this, const char* key);
 void* HashSet_remove(HashSet* this, void* data);
 int32_t HashSet_set_max_load_factor(HashSet* this, double max_load_factor);
 double HashSet_get_max_load_factor(HashSet* this);
 double HashSet_get_current_load_factor(HashSet* this);
 void HashSet_map(HashSet* this, void (*func)(void* ));
 
-/* HSIterator methods */
+/* HSIterator methods + macro */
 HSIterator* HSIterator_new(HashSet* HashSet);
 void HSIterator_destroy(HSIterator* this);
 void* HSIterator_peak(HSIterator* this);
 void* HSIterator_next(HSIterator* this);
 void HSIterator_reset(HSIterator* this);
 bool _HSIterator_destroy(HSIterator* this); 
-#define HS_for(hset, val) for (HSIterator* UNIQUE_NAME = HSIterator_new(hset); (val = HSIterator_next(UNIQUE_NAME)) != NULL || _HSIterator_destroy(UNIQUE_NAME);)
 
+#define _HS_for_(_hset, _val, unique_id) for (HSIterator* unique_id = HSIterator_new(_hset); (_val = HSIterator_next(unique_id)) != NULL || _HSIterator_destroy(unique_id);)
+#define HS_for(hset, val) _HS_for_(hset, val, _UNIQUE_ID_)
 
 
 #endif
