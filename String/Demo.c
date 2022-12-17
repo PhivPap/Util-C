@@ -14,16 +14,13 @@ int main(int argc, const char** argv){
 
     printf("%s\n", String_data(str0));
 
-    StringIterator* iter = StringIterator_new(str0);
+    StringIterator iter = StringIterator_new(str0);
     char c;
-    while(c = StringIterator_next(iter)){
+    while(c = StringIterator_next(&iter))
         printf("## %c\n", c);
-    }
-    StringIterator_prev(iter);
-    while(c = StringIterator_prev(iter)){
+    StringIterator_prev(&iter);
+    while(c = StringIterator_prev(&iter))
         printf("%c", c);
-    }
-    StringIterator_destroy(iter);
     putc('\n', stdout);
 
     String_destroy(str0);
@@ -34,10 +31,9 @@ int main(int argc, const char** argv){
     String* str = String_new_copy("CSV,like,parsing,missing,,values,,,");
     List* cells = String_split(str, ",");
     String* cell;
-    ListIterator* cell_iter = ListIterator_new(cells);
-    while(cell = ListIterator_next(cell_iter))
+    ListIterator cell_iter = ListIterator_new(cells);
+    while(cell = ListIterator_next(&cell_iter))
         printf("{%s}\n", String_data(cell));
-    ListIterator_destroy(cell_iter);
     List_map(cells, (void (*)(void* ))String_destroy);
     List_destroy(cells);
     String_destroy(str);
