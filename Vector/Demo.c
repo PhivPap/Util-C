@@ -13,11 +13,10 @@ int main(int argc, const char* argv[]){
     Vector_set(vec, &e, 10);
 
 
-    VIterator* iter = VIterator_new(vec);
+    VIterator iter = VIterator_new(vec);
     int* data;
-    while((data = VIterator_next(iter)) != NULL)
+    while((data = VIterator_next(&iter)) != NULL)
         *data += 10;
-    VIterator_destroy(iter);
 
     V_for(vec, data)
         printf("%d\n", *data);

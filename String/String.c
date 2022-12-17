@@ -9,10 +9,7 @@ struct String {
     uint length, size;
 };
 
-struct StringIterator {
-    String* string;
-    int index;
-};
+
 
 const uint DEF_SIZE = 20;               /* used by empty constructor */
 
@@ -232,17 +229,11 @@ List* String_split(String* this, const char* delim){
 }
 
 /* StringIterator */
-StringIterator* StringIterator_new(String* str){
-    StringIterator* this = malloc(sizeof(StringIterator));
-    if(!this)
-        return NULL;
-    this->string = str;
-    this->index = 0;
-    return this;
-}
-
-void StringIterator_destroy(StringIterator* this){
-    free(this);
+StringIterator StringIterator_new(String* str){
+    return (StringIterator) {
+        .string = str,
+        .index = 0
+    };
 }
 
 int StringIterator_index(const StringIterator* this){

@@ -19,20 +19,18 @@ int main(int argc, const char** argv){
 
     printf("========= Iterator =========\n");
     HashTable_map(ht, map_func_triple);
-    HTIterator* iter = HTIterator_new(ht);
+    HTIterator iter = HTIterator_new(ht);
     void* data;
     const char* key;
-    while((data = HTIterator_next(iter)) != NULL)
+    while((data = HTIterator_next(&iter)) != NULL)
         printf("%d\n", *(int*)data);
-    HTIterator_destroy(iter);
 
     // =============================================
 
     printf("======= Key iterator =======\n");
-    HTKeyIterator* key_iter = HTKeyIterator_new(ht);
-    while ((key = HTKeyIterator_next(key_iter)) != NULL)
+    HTKeyIterator key_iter = HTKeyIterator_new(ht);
+    while ((key = HTKeyIterator_next(&key_iter)) != NULL)
         printf("%s\n", key);
-    HTKeyIterator_destroy(key_iter);
     
     // =============================================
 

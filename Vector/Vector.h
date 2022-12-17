@@ -10,7 +10,12 @@
 
 /* Opaque types */
 typedef struct Vector Vector;
-typedef struct VIterator VIterator;
+
+/* Types */
+typedef struct VIterator {
+    Vector* vector;
+    int32_t index;
+} VIterator;
 
 /* Vector methods */
 Vector* Vector_new(void);
@@ -29,13 +34,11 @@ void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, 
 Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 
 /* VIterator methods + macro */
-VIterator* VIterator_new(Vector* vector);
-void VIterator_destroy(VIterator* this);
+VIterator VIterator_new(Vector* vector);
 void* VIterator_peak(VIterator* this);
 void* VIterator_next(VIterator* this);
-bool _VIterator_destroy(VIterator* this);
 
-#define _V_for_(_vec, _val, unique_id) for (VIterator* unique_id = VIterator_new(_vec); (_val = VIterator_next(unique_id)) != NULL || _VIterator_destroy(unique_id); )
+#define _V_for_(_vec, _val, unique_id) for (VIterator unique_id = VIterator_new(_vec); (_val = VIterator_next(&unique_id)) != NULL; )
 #define V_for(vec, val) _V_for_(vec, val, _UNIQUE_ID_)
 
 

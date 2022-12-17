@@ -11,16 +11,13 @@ int main(int argc, const char* argv[]) {
     HashSet_insert(hset, &c);
     HashSet_insert(hset, &d);
 
-    HSIterator* it = HSIterator_new(hset);
-    while ((data = HSIterator_next(it)) != NULL)
+    HSIterator iter = HSIterator_new(hset);
+    while ((data = HSIterator_next(&iter)) != NULL)
         *data *= 0.5;
-    HSIterator_destroy(it);
 
     HS_for(hset, data)
         printf("=> %f <=\n", *data);
 
-
     HashSet_destroy(hset);
-
     return 0;
 }

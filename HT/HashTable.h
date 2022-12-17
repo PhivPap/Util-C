@@ -7,6 +7,8 @@
 #define _LABEL_(num) _MERGE_(_uniq_, num)
 #define _UNIQUE_ID_ _LABEL_(__COUNTER__)
 
+/* Opaque types */
+typedef struct HashTable HashTable;
 
 /* Types */
 typedef struct HTPair {
@@ -14,11 +16,21 @@ typedef struct HTPair {
     const void* value;
 } HTPair;
 
-/* Opaque types */
-typedef struct HashTable HashTable;
-typedef struct HTIterator HTIterator;
-typedef struct HTPairIterator HTPairIterator;
-typedef struct HTKeyIterator HTKeyIterator;
+typedef struct HTIterator {
+    HashTable* hashtable;
+    uint32_t index;
+} HTIterator;
+
+typedef struct HTKeyIterator {
+    HashTable* hashtable;
+    uint32_t index;
+} HTKeyIterator;
+
+typedef struct HTPairIterator {
+    HashTable* hashtable;
+    uint32_t index;
+    HTPair pair;
+} HTPairIterator;
 
 /* HashTable methods */
 HashTable* HashTable_new(void);
@@ -40,35 +52,32 @@ void HashTable_serialize(HashTable* this, FILE* fp, void (*value_serializer)(FIL
 HashTable* HashTable_deserialize(FILE* fp, void* (*value_deserializer)(FILE* fp));
 
 /* HTIterator methods + macro */
-HTIterator* HTIterator_new(HashTable* hashtable);
-void* HTIterator_destroy(HTIterator* this);
+HTIterator HTIterator_new(HashTable* hashtable);
 void* HTIterator_peak(HTIterator* this);
 void* HTIterator_next(HTIterator* this);
 void HTIterator_reset(HTIterator* this);
 #define _HT_for_(_ht, _val, unique_id) \
 for ( \
-    HTIterator* unique_id = HTIterator_new(_ht); \
-    (_val = HTIterator_next(unique_id)) != NULL || HTIterator_destroy(unique_id); \
+    HTIterator unique_id = HTIterator_new(_ht); \
+    (_val = HTIterator_next(&unique_id)) != NULL; \
 )
 #define HT_for(ht, val) _HT_for_(ht, val, _UNIQUE_ID_)
 
 /* HTKeyIterator methods + macro */
-HTKeyIterator* HTKeyIterator_new(HashTable* hashtable);
-void HTKeyIterator_destroy(HTKeyIterator* this);
+HTKeyIterator HTKeyIterator_new(HashTable* hashtable);
 const char* HTKeyIterator_peak(HTKeyIterator* this);
 const char* HTKeyIterator_next(HTKeyIterator* this);
 void HTKeyIterator_reset(HTKeyIterator* this);
 
 #define _HTKey_for_(ht, _key, unique_id0) \
 for ( \
-    HTIterator* unique_id0 = HTKeyIterator_new(ht); \
-    (_key = HTKeyIterator_next(unique_id0)) != NULL || HTKeyIterator_destroy(unique_id0); \
+    HTKeyIterator unique_id0 = HTKeyIterator_new(ht); \
+    (_key = HTKeyIterator_next(&unique_id0)) != NULL; \
 )
 #define HTKey_for(ht, key) _HTKey_for_(ht, key, _UNIQUE_ID_)
 
 /* HTPairIterator methods + macro */
-HTPairIterator* HTPairIterator_new(HashTable* hashtable);
-void* HTPairIterator_destroy(HTPairIterator* this);
+HTPairIterator HTPairIterator_new(HashTable* hashtable);
 HTPair* HTPairIterator_peak(HTPairIterator* this);
 HTPair* HTPairIterator_next(HTPairIterator* this);
 void HTPairIterator_reset(HTPairIterator* this);
@@ -76,8 +85,8 @@ void HTPairIterator_reset(HTPairIterator* this);
 #define _HTPair_for_(_ht, _key, _val, unique_id0, unique_id1) \
 HTPair* unique_id0; \
 for ( \
-    HTPairIterator* unique_id1 = HTPairIterator_new(_ht); \
-    ((unique_id0 = HTPairIterator_next(unique_id1)) != NULL && (_key = unique_id0->key) && (_val = (typeof(_val))unique_id0->value)) || HTPairIterator_destroy(unique_id1); \
+    HTPairIterator unique_id1 = HTPairIterator_new(_ht); \
+    (unique_id0 = HTPairIterator_next(&unique_id1)) != NULL && (_key = unique_id0->key) && (_val = (typeof(_val))unique_id0->value); \
 )
 #define HTPair_for(ht, key, val) _HTPair_for_(ht, key, val, _UNIQUE_ID_, _UNIQUE_ID_)
 

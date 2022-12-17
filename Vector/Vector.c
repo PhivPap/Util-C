@@ -9,10 +9,10 @@ const int32_t DEF_SIZE = 50;
 const int32_t EXPAND_RATE = 2;
 const int32_t RESERVE_EXP_LEN = 50;
 
-struct VIterator {
-    Vector* vector;
-    int32_t index;
-};
+// struct VIterator {
+//     Vector* vector;
+//     int32_t index;
+// };
 
 struct Vector {
     void** table;
@@ -112,24 +112,13 @@ void* Vector_back(Vector* this){
 }
 
 void Vector_map(Vector* this, void (*func)(void *)){
-    VIterator* iter = VIterator_new(this);
-    void* vec_elem;
-    while((vec_elem = VIterator_next(iter)) != NULL)
-        func(vec_elem);
-    VIterator_destroy(iter);
+    void* item;
+    V_for(this, item)
+        func(item);
 }
 
-VIterator* VIterator_new(Vector* vector){
-    VIterator* this = malloc(sizeof(VIterator));
-    if (!this)
-        return NULL;
-    this->vector = vector;
-    this->index = 0;
-    return this;
-}
-
-void VIterator_destroy(VIterator* this){
-    free(this);
+VIterator VIterator_new(Vector* vector){
+    return (VIterator) { .vector = vector, .index = 0 };
 }
 
 void* VIterator_peak(VIterator* this){
@@ -150,11 +139,6 @@ void* VIterator_next(VIterator* this){
 
 void VIterator_reset(VIterator* this){
     this->index = 0;
-}
-
-bool _VIterator_destroy(VIterator* this) {
-    VIterator_destroy(this);
-    return false;
 }
 
 void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item)) {

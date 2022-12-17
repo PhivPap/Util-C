@@ -13,12 +13,11 @@ int main(int argc, const char** argv){
     for(unsigned int i=0; i<10; i++)
         List_append(list, (void*)int_to_str(i*2));
 
-    ListIterator* iter = ListIterator_new(list);
+    ListIterator iter = ListIterator_new(list);
     void* data;
-    while((data = ListIterator_next(iter)) != NULL)
+    while((data = ListIterator_next(&iter)) != NULL)
         printf("%s\n", (char*)data);
 
-    ListIterator_destroy(iter);
     List_map(list, free); // free() all elems
     List_destroy(list);
 }

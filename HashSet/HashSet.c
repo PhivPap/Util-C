@@ -21,10 +21,7 @@ struct HashSet {
     uint32_t (*hash_function)(const void* , uint32_t);
 };
 
-struct HSIterator {
-    HashSet* set;
-    uint32_t index;
-};
+
 
 static uint32_t def_hash_function(const void* data, uint32_t table_size){
     static const uint32_t HASH_MUTLIPLIER = 65599;
@@ -245,24 +242,16 @@ int32_t HashSet_contains(HashSet* this, void* key){
 }
 
 void HashSet_map(HashSet* this, void (*func)(void* )){
-    HSIterator* iter = HSIterator_new(this);
-    void* ht_elem;
-    while((ht_elem = HSIterator_next(iter)) != NULL)
-        func(ht_elem);
-    HSIterator_destroy(iter);
+    void* item;
+    HS_for(this, item)
+        func(item);
 }
 
-HSIterator* HSIterator_new(HashSet* set){
-    HSIterator* this = malloc(sizeof(HSIterator));
-    if(!this)
-        return NULL;
-    this->set = set;
-    this->index = 0;
-    return this;
-}
-
-void HSIterator_destroy(HSIterator* this){
-    free(this);
+HSIterator HSIterator_new(HashSet* set){
+    return (HSIterator) {
+        .set = set,
+        .index = 0
+    };
 }
 
 void* HSIterator_peak(HSIterator* this){
@@ -288,9 +277,4 @@ void* HSIterator_next(HSIterator* this){
 
 void HSIterator_reset(HSIterator* this){
     this->index = 0;
-}
-
-bool _HSIterator_destroy(HSIterator* this) {
-    HSIterator_destroy(this);
-    return false;
 }

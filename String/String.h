@@ -5,7 +5,12 @@
 
 /* Opaque types */
 typedef struct String String;
-typedef struct StringIterator StringIterator;
+
+/* Types */
+typedef struct StringIterator {
+    String* string;
+    int index;
+} StringIterator;
 
 /* String methods */
 String* String_new();
@@ -30,8 +35,7 @@ List* String_split(String* this, const char* delim);
 
 
 /* StringIterator methods */
-StringIterator* StringIterator_new(String* str);
-void StringIterator_destroy(StringIterator* this);
+StringIterator StringIterator_new(String* str);
 int StringIterator_index(const StringIterator* this);
 char StringIterator_peak(const StringIterator* this);
 char StringIterator_next(StringIterator* this);

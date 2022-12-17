@@ -9,7 +9,12 @@
 
 /* Opaque types */
 typedef struct HashSet HashSet;
-typedef struct HSIterator HSIterator;
+
+/* Types */
+typedef struct HSIterator {
+    HashSet* set;
+    uint32_t index;
+} HSIterator;
 
 /* HashSet methods */
 HashSet* HashSet_new(void);
@@ -28,14 +33,12 @@ double HashSet_get_current_load_factor(HashSet* this);
 void HashSet_map(HashSet* this, void (*func)(void* ));
 
 /* HSIterator methods + macro */
-HSIterator* HSIterator_new(HashSet* HashSet);
-void HSIterator_destroy(HSIterator* this);
+HSIterator HSIterator_new(HashSet* HashSet);
 void* HSIterator_peak(HSIterator* this);
 void* HSIterator_next(HSIterator* this);
 void HSIterator_reset(HSIterator* this);
-bool _HSIterator_destroy(HSIterator* this); 
 
-#define _HS_for_(_hset, _val, unique_id) for (HSIterator* unique_id = HSIterator_new(_hset); (_val = HSIterator_next(unique_id)) != NULL || _HSIterator_destroy(unique_id);)
+#define _HS_for_(_hset, _val, unique_id) for (HSIterator unique_id = HSIterator_new(_hset); (_val = HSIterator_next(&unique_id)) != NULL; )
 #define HS_for(hset, val) _HS_for_(hset, val, _UNIQUE_ID_)
 
 

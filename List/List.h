@@ -3,7 +3,13 @@
 
 /* Opaque types */
 typedef struct List List;
-typedef struct ListIterator ListIterator;
+typedef struct ListNode ListNode;
+
+/* Types */
+typedef struct ListIterator {
+    List* list;
+    ListNode* current_node;
+} ListIterator;
 
 /* List methods */
 List* List_new(void);
@@ -18,8 +24,7 @@ void* List_remove(List* this, unsigned int index);
 void List_map(List* this, void (*func)(void* ));
 
 /* ListIterator methods */
-ListIterator* ListIterator_new(List* list);
-void ListIterator_destroy(ListIterator* this);
+ListIterator ListIterator_new(List* list);
 int ListIterator_has_next(ListIterator* this);
 void* ListIterator_next(ListIterator* this);
 void* ListIterator_peak(ListIterator* this);

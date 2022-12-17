@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 typedef unsigned int uint;
-typedef struct ListNode ListNode;
 
 struct ListNode {
     void* data;
@@ -13,11 +12,6 @@ struct List {
     ListNode* head;
     ListNode* tail;
     uint length;
-};
-
-struct ListIterator {
-    List* list;
-    ListNode* current_node;
 };
 
 
@@ -158,24 +152,17 @@ void* List_remove(List* this, unsigned int index){
 }
 
 void List_map(List* this, void (*func)(void* )){
-    ListIterator* iter = ListIterator_new(this);
+    ListIterator iter = ListIterator_new(this);
     void* list_item;
-    while((list_item = ListIterator_next(iter)) != NULL)
+    while((list_item = ListIterator_next(&iter)) != NULL)
         func(list_item);
-    ListIterator_destroy(iter);
 }
 
-ListIterator* ListIterator_new(List* list){
-    ListIterator* this = malloc(sizeof(ListIterator));
-    if(!this)
-        return NULL;
-    this->list = list;
-    this->current_node = list->head;
-    return this;
-}
-
-void ListIterator_destroy(ListIterator* this){
-    free(this);
+ListIterator ListIterator_new(List* list){
+    return (ListIterator) {
+        .list = list,
+        .current_node = list->head
+    };
 }
 
 int ListIterator_has_next(ListIterator* this){

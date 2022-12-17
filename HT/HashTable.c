@@ -22,22 +22,6 @@ struct HashTable {
     uint32_t (*hash_function)(const char* , uint32_t);
 };
 
-struct HTIterator {
-    HashTable* hashtable;
-    uint32_t index;
-};
-
-struct HTKeyIterator {
-    HashTable* hashtable;
-    uint32_t index;
-};
-
-struct HTPairIterator {
-    HashTable* hashtable;
-    uint32_t index;
-    HTPair pair;
-};
-
 static uint32_t def_hash_function(const char* key, uint32_t table_size){
     static const uint32_t HASH_MUTLIPLIER = 65599;
     uint32_t hash_value = 0;
@@ -71,7 +55,7 @@ static void HashTable_insert_node(HashTable* this, Node* node){
             break;
         }
         idx++;
-        idx = idx % this->capacity;
+        idx %= this->capacity;
     }
 }
 
@@ -279,11 +263,9 @@ int32_t HashTable_contains(HashTable* this, const char* key){
 }
 
 void HashTable_map(HashTable* this, void (*func)(void* )){
-    HTIterator* iter = HTIterator_new(this);
-    void* ht_elem;
-    while((ht_elem = HTIterator_next(iter)) != NULL)
-        func(ht_elem);
-    HTIterator_destroy(iter);
+    void* item;
+    HT_for(this, item)
+        func(item);
 }
 
 void HashTable_serialize(HashTable* this, FILE* fp, void (*value_serializer)(FILE* fp, void* value)) {
@@ -315,18 +297,11 @@ HashTable* HashTable_deserialize(FILE* fp, void* (*value_deserializer)(FILE* fp)
     return this;
 }
 
-HTIterator* HTIterator_new(HashTable* hashtable){
-    HTIterator* this = malloc(sizeof(HTIterator));
-    if(!this)
-        return NULL;
-    this->hashtable = hashtable;
-    this->index = 0;
-    return this;
-}
-
-void* HTIterator_destroy(HTIterator* this){
-    free(this);
-    return NULL;
+HTIterator HTIterator_new(HashTable* hashtable){
+    return (HTIterator) { 
+        .hashtable = hashtable, 
+        .index = 0 
+    };
 }
 
 void* HTIterator_peak(HTIterator* this){
@@ -354,17 +329,11 @@ void HTIterator_reset(HTIterator* this){
     this->index = 0;
 }
 
-HTKeyIterator* HTKeyIterator_new(HashTable* hashtable) {
-    HTKeyIterator* this = malloc(sizeof(HTKeyIterator));
-    if(!this)
-        return NULL;
-    this->hashtable = hashtable;
-    this->index = 0;
-    return this;
-}
-
-void HTKeyIterator_destroy(HTKeyIterator* this) {
-    free(this);
+HTKeyIterator HTKeyIterator_new(HashTable* hashtable) {
+    return (HTKeyIterator) {
+        .hashtable = hashtable, 
+        .index = 0
+    };
 }
 
 const char* HTKeyIterator_peak(HTKeyIterator* this) {
@@ -392,18 +361,11 @@ void HTKeyIterator_reset(HTKeyIterator* this) {
     this->index = 0;
 }
 
-HTPairIterator* HTPairIterator_new(HashTable* hashtable){
-    HTPairIterator* this = malloc(sizeof(HTPairIterator));
-    if(!this)
-        return NULL;
-    this->hashtable = hashtable;
-    this->index = 0;
-    return this;
-}
-
-void* HTPairIterator_destroy(HTPairIterator* this){
-    free(this);
-    return NULL;
+HTPairIterator HTPairIterator_new(HashTable* hashtable){
+    return (HTPairIterator) {
+        .hashtable = hashtable,
+        .index = 0
+    };
 }
 
 HTPair* HTPairIterator_peak(HTPairIterator* this){
