@@ -1,5 +1,6 @@
-#ifndef _MY_VECTOR_
-#define _MY_VECTOR_
+#ifndef _vec_
+#define _vec_
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -14,22 +15,22 @@ typedef struct Vector Vector;
 /* Types */
 typedef struct VIterator {
     Vector* vector;
-    int32_t index;
+    int32_t idx;
 } VIterator;
 
 /* Vector methods */
 Vector* Vector_new(void);
-Vector* Vector_new_init_size(uint32_t size);
+Vector* Vector_new_init_size(uint64_t size);
 void Vector_destroy(Vector* this);
-uint32_t Vector_size(Vector* this);
-uint32_t Vector_capacity(Vector* this);
+uint64_t Vector_size(Vector* this);
+uint64_t Vector_capacity(Vector* this);
 void Vector_clear(Vector* this);
 int Vector_pushback(Vector* this, const void* data);
-void* Vector_get(Vector* this, uint32_t index);
-int Vector_set(Vector* this, const void* data, uint32_t index);
+void* Vector_get(Vector* this, uint64_t index);
+int Vector_set(Vector* this, uint64_t idx, const void* data);
 void* Vector_front(Vector* this);
 void* Vector_back(Vector* this);
-void Vector_map(Vector* this, void (*func)(void *));
+void Vector_apply(Vector* this, void (*func)(void *));
 void Vector_serialize(Vector* this, FILE* fp, void (*item_serializer)(FILE* fp, void* item));
 Vector* Vector_deserialize(FILE* fp, void* (*item_deserializer)(FILE* fp));
 

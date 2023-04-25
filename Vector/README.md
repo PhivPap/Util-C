@@ -1,2 +1,2 @@
 # Vector
-Implementation of a generic Vector ADT.
+Generic Vector ADT
